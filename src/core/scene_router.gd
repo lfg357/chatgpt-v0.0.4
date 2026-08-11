@@ -3,5 +3,8 @@ const PATHS := {AppState.AppMode.MAIN_MENU: "res://scenes/ui/main_menu.tscn", Ap
 func go_to(mode: AppState.AppMode) -> Result:
 	var result := AppState.request_transition(mode)
 	if not result.ok: return result
-	if PATHS.has(mode): get_tree().change_scene_to_file(PATHS[mode])
+	if PATHS.has(mode): call_deferred("_change_scene", PATHS[mode])
 	return Result.success()
+
+func _change_scene(path: String) -> void:
+	get_tree().change_scene_to_file(path)
