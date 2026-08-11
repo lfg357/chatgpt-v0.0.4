@@ -5,11 +5,13 @@ class_name TerrainWorld extends Node2D
 ## immediately, then rebuild under the service's per-tick budget.
 @export var cell_size: int = 8
 @export var grid_size := Vector2i(64, 32)
+@export var initially_solid := true
 var terrain := TerrainService.new()
 var chunk_bodies: Dictionary[Vector2i, StaticBody2D] = {}
 
 func _ready() -> void:
 	terrain.setup(grid_size.x, grid_size.y)
+	if not initially_solid: terrain.cells.fill(0)
 	queue_redraw()
 
 func request_damage(cell: Vector2i, amount: int = 1) -> bool:
@@ -17,6 +19,9 @@ func request_damage(cell: Vector2i, amount: int = 1) -> bool:
 
 func request_explosion(center: Vector2i, radius: int) -> int:
 	return terrain.request_explosion(center, radius)
+
+func restore_solid(cell: Vector2i) -> bool:
+	return terrain.restore_solid(cell)
 
 func _physics_process(_delta: float) -> void:
 	var changed := terrain.commit_damage()

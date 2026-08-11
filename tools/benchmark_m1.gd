@@ -2,14 +2,13 @@ extends SceneTree
 
 const TerrainService = preload("res://src/gameplay/terrain_service.gd")
 const ObjectPool = preload("res://src/gameplay/object_pool.gd")
-const EffectPools = preload("res://src/gameplay/effect_pools.gd")
 var warmup_seconds := 10.0
 var sample_seconds := 120.0
 const ACTIVE_TILES := 500
 const TICK_SECONDS := 1.0 / 60.0
 
 var terrain := TerrainService.new()
-var particles := EffectPools.new()
+var particles := ObjectPool.new()
 var environment := ObjectPool.new()
 var frame_times: Array[float] = []
 var work_times: Array[float] = []
@@ -28,7 +27,7 @@ func _run() -> void:
 	terrain.cells.fill(0)
 	for index in ACTIVE_TILES:
 		terrain.restore_solid(Vector2i(index % 64, index / 64))
-	particles.warm_all(50)
+	particles.warm(200)
 	environment.warm(20)
 	# Keep collision construction out of the sampled interval.
 	while not terrain.dirty_chunks.is_empty(): terrain.physics_tick()

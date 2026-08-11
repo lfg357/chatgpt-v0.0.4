@@ -2,7 +2,6 @@ extends SceneTree
 
 const TerrainService = preload("res://src/gameplay/terrain_service.gd")
 const ObjectPool = preload("res://src/gameplay/object_pool.gd")
-const EffectPools = preload("res://src/gameplay/effect_pools.gd")
 const DURATION_SECONDS := 600.0
 const TICK_SECONDS := 1.0 / 60.0
 
@@ -12,8 +11,8 @@ func _init() -> void:
 func _run() -> void:
 	var terrain := TerrainService.new()
 	terrain.setup(256, 256)
-	var particles := EffectPools.new()
-	particles.warm_all(50)
+	var particles := ObjectPool.new()
+	particles.warm(200)
 	var removed := 0
 	var frames := 0
 	var delete_cursor := 0
@@ -31,8 +30,8 @@ func _run() -> void:
 		removed += terrain.commit_damage()
 		terrain.physics_tick()
 		if frames % 30 == 0:
-			var particle := particles.acquire(&"debris")
-			particles.release(&"debris", particle)
-	var ok := terrain.dirty_chunks.is_empty() and particles.debris.active.is_empty() and removed >= 23_800
-	print("ENDURANCE seconds=%.1f frames=%d removed=%d rebuilds=%d pool_available=%d status=%s" % [DURATION_SECONDS, frames, removed, terrain.total_rebuilds, particles.debris.available.size(), "pass" if ok else "fail"])
+			var particle := particles.acquire()
+			particles.release(particle)
+	var ok := terrain.dirty_chunks.is_empty() and particles.active.is_empty() and removed >= 23_800
+	print("ENDURANCE seconds=%.1f frames=%d removed=%d rebuilds=%d pool_available=%d status=%s" % [DURATION_SECONDS, frames, removed, terrain.total_rebuilds, particles.available.size(), "pass" if ok else "fail"])
 	quit(0 if ok else 1)
