@@ -1,4 +1,4 @@
-extends TestCase
+extends "res://tests/test_case.gd"
 var trace: Array[String] = []
 func before_all() -> bool: trace.append("before_all"); return true
 func before_each() -> bool: trace.append("before_each"); return true

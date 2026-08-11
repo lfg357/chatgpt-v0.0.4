@@ -1,4 +1,4 @@
-extends TestCase
+extends "res://tests/test_case.gd"
 const TerrainService = preload("res://src/gameplay/terrain_service.gd")
 const ObjectPool = preload("res://src/gameplay/object_pool.gd")
 const EffectPools = preload("res://src/gameplay/effect_pools.gd")

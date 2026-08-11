@@ -1,4 +1,4 @@
-extends TestCase
+extends "res://tests/test_case.gd"
 
 var cleanup_ran := false
 

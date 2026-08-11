@@ -1,4 +1,4 @@
-extends TestCase
+extends "res://tests/test_case.gd"
 const ContentDBScript = preload("res://src/core/content_db.gd")
 
 func test_csv_localization_registers_runtime_translations() -> bool:

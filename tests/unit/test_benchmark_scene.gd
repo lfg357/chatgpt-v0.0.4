@@ -1,4 +1,4 @@
-extends TestCase
+extends "res://tests/test_case.gd"
 const BenchmarkScene = preload("res://scenes/benchmarks/m1_benchmark.tscn")
 
 func test_benchmark_scene_declares_fixed_load() -> bool:

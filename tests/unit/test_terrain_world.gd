@@ -1,4 +1,4 @@
-extends TestCase
+extends "res://tests/test_case.gd"
 const TerrainWorld = preload("res://src/gameplay/terrain_world.gd")
 
 func test_dirty_chunk_disables_existing_collision_before_rebuild() -> bool:

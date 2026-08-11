@@ -1,4 +1,4 @@
-extends TestCase
+extends "res://tests/test_case.gd"
 
 func before_all() -> bool: timeout_seconds = 0.001; return true
 

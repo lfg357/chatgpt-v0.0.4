@@ -1,4 +1,4 @@
-extends TestCase
+extends "res://tests/test_case.gd"
 func test_app_mode_rejects_illegal_transition() -> bool:
 	var state := preload("res://src/core/app_state.gd").new()
 	assert_true(not state.request_transition(state.AppMode.DIVE).ok)

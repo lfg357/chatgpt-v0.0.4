@@ -1,4 +1,4 @@
-extends TestCase
+extends "res://tests/test_case.gd"
 func before_all() -> bool: timeout_seconds = 0.001; return true
 func test_timeout_is_detected() -> bool:
 	var until := Time.get_ticks_usec() + 10_000
