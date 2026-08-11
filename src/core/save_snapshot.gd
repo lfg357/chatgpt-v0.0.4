@@ -18,8 +18,9 @@ var statistics: Dictionary = {"total_runs": 0, "successful_runs": 0, "failed_run
 func to_dict() -> Dictionary:
 	return {"schema_version": schema_version, "content_version": content_version, "profile_id": profile_id, "created_unix": created_unix, "updated_unix": updated_unix, "economy": economy, "unlocks": unlocks, "facilities": facilities, "modules": modules, "echoes": echoes, "timeline": timeline, "archives": archives, "tutorial": tutorial, "statistics": statistics}
 
-static func from_dict(value: Dictionary) -> SaveSnapshot:
-	var snapshot := SaveSnapshot.new()
+static func from_dict(value: Dictionary):
+	# See Result: avoid self class_name references during cache-free --script runs.
+	var snapshot = load("res://src/core/save_snapshot.gd").new()
 	for key in snapshot.to_dict().keys():
 		if value.has(key): snapshot.set(key, value[key])
 	return snapshot
