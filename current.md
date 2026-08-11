@@ -45,4 +45,4 @@
 
 - OA-013：所有被自动发现的测试及自测夹具改为显式继承 `res://tests/test_case.gd`，不再依赖 Godot 编辑器生成的全局 `class_name` 缓存；从 `git archive HEAD` 生成的纯快照在无 `.godot` 缓存下执行 `verify.ps1 -Quick` 已通过。
 - OA-014：耐久脚本默认改为 1,800 秒，记录起止 `MEMORY_STATIC`、计算增长百分比并执行 Windows ≤10% / Web ≤15% 门禁；`verify.ps1` 的默认全量路径已纳入此项，并增加强制越限自测。真实连续 1,800 秒于 Windows/headless 通过：起始 24.394 MB、结束 24.431 MB、增长 0.153%（≤10%）、86,959 帧、65,536 块移除、3,277 次重建、对象池 200 可用。
-- QA-015（处理中）：冷启动复现确认 `--script` 不会保证编辑器的全局类缓存，导致 Autoload 的 `Result`、`ContentDef`、`SaveSnapshot`、`AppSettings` 解析失败。核心与地形依赖改为显式 `preload`，并新增 Autoload 解析门禁及其非零自测；待纯 Git 快照完整复验。
+- QA-015：冷启动复现确认 `--script` 不会保证编辑器的全局类缓存，导致 Autoload 的 `Result`、`ContentDef`、`SaveSnapshot`、`AppSettings` 解析失败。核心与地形依赖已改为显式 `preload`，并新增 Autoload 解析门禁及其非零自测；从纯 Git 快照在无 `.godot` 缓存下执行 `verify.ps1 -Quick` 已完整通过，且不再出现核心 Autoload 解析错误。
