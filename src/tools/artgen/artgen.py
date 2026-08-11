@@ -51,100 +51,118 @@ def line(m: list[list[int]], x0:int,y0:int,x1:int,y1:int,c:int) -> None:
 
 def drill_frame(state: str, phase: int) -> list[list[int]]:
     m=blank(32,32); o=1
-    # Center anchor is always (16,16); 1px coal outline holds the silhouette.
-    rect(m,8,11,14,10,o); rect(m,11,8,9,3,o); rect(m,11,21,10,3,o)
-    rect(m,9,12,13,8,3); rect(m,12,9,7,2,4); rect(m,11,13,12,6,5)
-    # Double-panel maintenance hull: recessed screen, inspection plate and rivets.
-    rect(m,12,14,8,4,6); rect(m,13,14,3,1,19); put(m,14,13,7)
-    rect(m,16,14,4,4,17); rect(m,17,15,2,2,18); put(m,17,15,19)
-    line(m,12,18,20,18,4); put(m,11,13,6); put(m,20,13,6); put(m,11,19,4); put(m,20,19,4)
-    # Carbide drill at the right, reinforced by compact outline.
-    rect(m,22,13,4,6,o); line(m,26,13,30,16,6); line(m,26,19,30,16,6); put(m,30,16,7)
-    # Copper cooling loop.
-    line(m,11,11,19,11,8); line(m,10,12,10,19,8); line(m,11,20,19,20,8); line(m,20,12,20,19,8)
-    put(m,11,12,12); put(m,19,19,11)
-    # Compact thruster and cargo frame.
-    rect(m,5,13,4,6,o); rect(m,6,14,3,4,4); rect(m,4,15,2,2,9); put(m,6,14,6); put(m,6,18,3)
-    line(m,10,22,20,22,6); put(m,9,22,6); put(m,21,22,6); line(m,11,23,19,23,3); put(m,12,24,4); put(m,18,24,4)
+    # New silhouette: squat repair crawler, copper boiler on the back and a narrow carbide nose.
+    line(m,8,22,9,12,o); line(m,9,12,13,7,o); line(m,13,7,20,7,o); line(m,20,7,24,12,o)
+    line(m,24,12,25,20,o); line(m,25,20,21,24,o); line(m,21,24,9,24,o); line(m,9,24,8,22,o)
+    rect(m,10,12,13,10,3); rect(m,12,9,8,4,4); rect(m,11,13,10,8,8)
+    # Sloped cab: warm rim, blue glass and a single pale visor sparkle.
+    line(m,13,9,19,9,8); line(m,12,10,12,15,8); line(m,19,10,21,15,8)
+    rect(m,14,11,5,4,17); put(m,15,11,19); put(m,18,12,19); put(m,14,15,3)
+    # Boiler/radiator is deliberately off-centre so the hull does not read as a box.
+    rect(m,9,14,3,6,10); rect(m,10,13,3,8,8); put(m,11,14,12); put(m,11,19,9)
+    # Riveted armor, tool hatch and a shaded crawler base.
+    rect(m,19,16,4,5,4); put(m,20,17,6); put(m,22,19,6); line(m,13,21,22,21,5)
+    rect(m,10,22,12,2,1); rect(m,11,23,10,2,4); put(m,12,24,6); put(m,16,24,2); put(m,20,24,6)
+    # Carbide biter: three teeth on an outlined cone at the front.
+    line(m,24,13,30,16,o); line(m,24,20,30,16,o); line(m,25,14,29,16,6); line(m,25,19,29,16,6)
+    put(m,27,15,7); put(m,28,16,12); put(m,27,17,7)
+    # Compact thruster, exhaust grille and cargo rail behind the crawler.
+    rect(m,5,15,4,5,o); rect(m,6,16,3,3,4); put(m,5,17,9); line(m,7,15,7,20,6)
+    line(m,9,20,9,23,6); line(m,8,21,10,21,6); put(m,8,23,4)
     if state=="thrust":
-        flame=[12,9,12,7][phase]; rect(m,4-flame//3,15,flame//3,2,12); put(m,3-flame//3,16,7)
+        flame=[8,12,10,6][phase]; rect(m,4-flame//3,16,flame//3,2,12); put(m,3-flame//3,17,7)
     elif state=="drill":
-        for p in range(phase%3+1): put(m,28+p,15+(p%2),12)
-        put(m,26,16,12); put(m,27,16,7)
+        for p in range(phase%4+2): put(m,28+p,14+(p*3)%6,12 if p%2 else 7)
+        put(m,25,16,12); put(m,26,16,7)
     elif state=="overheat":
-        for x,y in [(13,10),(17,10),(15,8),(18,13)]: put(m,x,y,24 if phase%2 else 9)
-        rect(m,5,13,3,6,9)
+        for x,y in [(11,11),(15,8),(20,11),(9,14),(22,14)]: put(m,x,y,24 if phase%2 else 9)
+        rect(m,5,15,3,5,9)
     elif state=="light_damage":
-        put(m,16,16,1); put(m,17,17,1); put(m,12,19,9)
+        line(m,16,15,18,18,1); put(m,12,20,9)
     elif state=="heavy_damage":
-        for x,y in [(13,15),(14,16),(17,17),(18,18),(10,19)]: put(m,x,y,1)
-        put(m,7,14,9); put(m,20,11,24)
+        for x,y in [(13,14),(14,15),(16,16),(17,17),(21,19),(10,19)]: put(m,x,y,1)
+        put(m,7,15,9); put(m,20,10,24)
     elif state=="destroyed":
         # Scatter remains around stable anchor, changing each frame but not canvas.
-        for i,(x,y) in enumerate([(10,17),(15,14),(19,18),(22,12),(7,22),(25,21),(13,25),(18,9)]):
+        for i,(x,y) in enumerate([(9,18),(14,13),(20,18),(24,12),(7,23),(26,21),(13,26),(18,8)]):
             put(m,x+(phase+i)%3-1,y+(phase*2+i)%3-1,[4,8,9,12][i%4])
-        rect(m,12,15,7,4,3 if phase<4 else 2); put(m,18,14,24)
+        rect(m,12,16,7,4,3 if phase<4 else 2); put(m,18,14,24)
     return m
 
 def tile(kind:int) -> list[list[int]]:
+    # Every tile begins with coal outline and a different material silhouette;
+    # this is an authored kit, not a recoloured square.
     m=blank(16,16); rect(m,0,0,16,16,1)
-    if kind==0: # solid rock
-        rect(m,1,1,14,14,3); rect(m,2,2,5,4,4); rect(m,9,2,4,5,2); rect(m,4,9,7,5,2); put(m,3,8,5); put(m,12,11,4); put(m,7,3,5); put(m,8,12,4); line(m,2,7,5,9,2)
-    elif kind==1: # brittle rock
-        rect(m,1,1,14,14,4); line(m,3,2,7,8,2); line(m,7,8,11,6,2); line(m,7,8,8,13,2); put(m,11,12,5); put(m,4,4,5); put(m,12,3,3)
-    elif kind==2: rect(m,1,1,14,14,3); rect(m,1,1,14,2,6); rect(m,1,13,14,2,2); line(m,3,3,12,3,5); put(m,3,1,7); put(m,12,1,7); put(m,5,14,4); put(m,10,14,4)
-    elif kind in (3,4,5,6):
-        rect(m,1,1,14,14,3); edge={3:(0,0,16,3),4:(0,13,16,3),5:(0,0,3,16),6:(13,0,3,16)}[kind]; rect(m,*edge,6); put(m,4,4,4); put(m,11,11,2)
-    elif kind in (7,8):
-        rect(m,1,1,14,14,3); rect(m,0 if kind==7 else 11,0,5,5,6); line(m,4 if kind==7 else 11,4,11 if kind==7 else 4,11,5)
-    elif kind==9: rect(m,0,0,16,16,2); rect(m,2,2,12,12,3); rect(m,4,4,7,1,4); put(m,11,9,4); put(m,3,11,4); put(m,12,5,5); line(m,5,12,9,12,2)
-    elif kind==10:
-        rect(m,0,0,16,16,3); rect(m,2,1,3,15,6); rect(m,11,1,3,15,6); line(m,4,4,11,4,5); line(m,4,10,11,10,5); put(m,3,3,1); put(m,12,3,1); put(m,3,12,1); put(m,12,12,1)
-    elif kind==11:
-        rect(m,0,0,16,16,2); line(m,1,8,14,8,8); line(m,4,2,4,8,8); line(m,11,8,11,14,8); put(m,4,2,12); put(m,11,14,12); put(m,2,8,6); put(m,13,8,6)
-    elif kind==12:
-        rect(m,0,0,16,16,3); rect(m,4,9,8,6,6); rect(m,6,4,4,5,1); rect(m,7,5,2,4,12); put(m,5,11,8); put(m,6,10,4); put(m,10,13,4); line(m,5,14,11,14,3)
-    elif kind==13:
-        rect(m,0,0,16,16,3); rect(m,2,10,12,4,2); line(m,3,11,12,11,19); put(m,4,10,24); put(m,10,10,24); put(m,6,12,19); put(m,12,12,19)
-    elif kind==14:
-        rect(m,0,0,16,16,4); line(m,3,2,7,7,2); line(m,7,7,5,13,2); line(m,9,4,13,10,2); rect(m,2,13,12,2,3); put(m,3,12,5); put(m,12,11,5)
-    else: # interactive highlighted rock: hatch/shine, not hue-only
-        rect(m,1,1,14,14,3); rect(m,2,2,5,4,4); line(m,2,12,12,2,12); put(m,3,12,7); put(m,12,3,7); line(m,5,14,14,5,11); put(m,8,8,7)
+    if kind==0: # solid shale: chunky diagonals and a compressed seam
+        rect(m,1,1,14,14,2); line(m,1,4,6,1,4); line(m,3,15,10,8,3); line(m,8,2,14,7,4); line(m,10,14,14,10,5); put(m,4,5,5); put(m,12,4,3); put(m,7,12,4)
+    elif kind==1: # brittle rock: pale face with a branching fracture
+        rect(m,1,1,14,14,4); line(m,2,2,8,8,5); line(m,8,8,13,6,2); line(m,8,8,6,14,2); line(m,6,14,3,12,2); put(m,3,4,6); put(m,11,3,5); put(m,12,12,3)
+    elif kind==2: # invulnerable plated boundary
+        rect(m,1,1,14,14,3); rect(m,1,1,14,3,6); rect(m,1,12,14,3,2); line(m,3,5,12,5,4); line(m,3,11,12,11,4); put(m,3,2,7); put(m,12,2,7); put(m,3,13,5); put(m,12,13,5)
+    elif kind in (3,4,5,6): # faced rock edges
+        rect(m,1,1,14,14,2); edge={3:(0,0,16,4),4:(0,12,16,4),5:(0,0,4,16),6:(12,0,4,16)}[kind]; rect(m,*edge,5)
+        if kind in (3,4): line(m,2,3 if kind==3 else 12,13,3 if kind==3 else 12,6)
+        else: line(m,3 if kind==5 else 12,2,3 if kind==5 else 12,13,6)
+        put(m,7,7,4); put(m,10,10,3)
+    elif kind==7: # inner structural corner
+        rect(m,1,1,14,14,2); rect(m,1,1,7,4,6); rect(m,1,1,4,8,6); line(m,4,8,11,8,4); line(m,8,4,8,11,4); put(m,3,3,7); put(m,10,10,5)
+    elif kind==8: # outer corner
+        rect(m,1,1,14,14,3); rect(m,10,1,5,5,6); rect(m,1,10,5,5,6); line(m,5,10,10,5,5); put(m,12,3,7); put(m,3,12,7)
+    elif kind==9: # distant rock wall with a recessed pipe scar
+        rect(m,0,0,16,16,17); rect(m,2,2,12,12,2); line(m,3,4,12,4,3); line(m,5,7,11,7,3); put(m,3,11,4); put(m,12,10,4); put(m,8,13,3)
+    elif kind==10: # bolted I-beam support
+        rect(m,0,0,16,16,2); rect(m,2,1,3,15,6); rect(m,11,1,3,15,6); rect(m,4,3,8,3,4); rect(m,4,10,8,3,4); put(m,3,2,7); put(m,12,2,7); put(m,3,14,5); put(m,12,14,5)
+    elif kind==11: # copper pipe elbow
+        rect(m,0,0,16,16,2); line(m,1,11,11,11,8); line(m,11,11,11,3,8); line(m,2,10,10,10,11); line(m,10,10,10,3,11); put(m,4,11,12); put(m,11,6,12); put(m,13,3,6)
+    elif kind==12: # steam socket with mechanical collar
+        rect(m,0,0,16,16,3); rect(m,3,10,10,5,1); rect(m,4,11,8,4,6); rect(m,6,5,4,6,2); rect(m,7,4,2,6,12); put(m,5,12,8); put(m,10,12,8); put(m,7,14,4)
+    elif kind==13: # live cable tray
+        rect(m,0,0,16,16,3); rect(m,1,10,14,5,1); rect(m,2,11,12,3,4); line(m,3,12,13,12,19); put(m,4,11,24); put(m,8,13,19); put(m,12,11,24); put(m,2,14,6); put(m,13,14,6)
+    elif kind==14: # loose collapse shale with falling chips
+        rect(m,1,4,14,11,4); line(m,2,5,8,10,2); line(m,8,10,13,6,2); line(m,9,3,11,5,5); put(m,3,12,5); put(m,12,12,5); put(m,5,2,4); put(m,14,8,4)
+    else: # interactive: chevrons + spark points, not colour-only highlighting
+        rect(m,1,1,14,14,2); line(m,2,12,8,6,12); line(m,8,6,14,12,12); line(m,3,14,9,8,11); put(m,4,4,7); put(m,12,4,7); put(m,8,2,12)
     return m
 
 def ore_frame(ore:int, phase:int) -> list[list[int]]:
-    m=blank(16,16); o=1; rect(m,4,4,8,8,o)
-    if ore==0: # ferrite
-        rect(m,5,5,6,6,4); put(m,6,5,6); put(m,9,8,2); put(m,5,10,5); put(m,10,6,5); put(m,7,9,3); put(m,5,7,3)
-    elif ore==1: # copper thread
-        line(m,4,10,7,4,8); line(m,7,4,12,8,8); line(m,12,8,8,12,8); put(m,7,5,12 if phase%2 else 11); put(m,5,9,11); put(m,10,9,12); put(m,8,11,10)
-    else: # lumen crystal
-        line(m,8,2,13,8,15); line(m,13,8,8,14,15); line(m,8,14,3,8,15); line(m,3,8,8,2,15); put(m,8,6,7 if phase%2 else 12); put(m,7,5,16); put(m,10,8,19); put(m,7,11,14)
+    m=blank(16,16); o=1
+    if ore==0: # ferrite: embedded rough ore cluster, not a freestanding square
+        line(m,3,12,5,4,o); line(m,5,4,11,3,o); line(m,11,3,13,10,o); line(m,13,10,9,13,o); line(m,9,13,3,12,o)
+        rect(m,5,6,6,5,4); put(m,5,5,6); put(m,8,4,5); put(m,11,7,6); put(m,9,10,3); put(m,6,10,5)
+    elif ore==1: # copper thread: branching vein caught in stone
+        line(m,2,12,5,8,o); line(m,5,8,7,3,o); line(m,7,3,11,7,o); line(m,11,7,14,5,o)
+        line(m,5,8,10,11,8); line(m,10,11,13,13,8); line(m,6,7,7,3,11); line(m,8,4,11,7,12); put(m,12,6,12 if phase%2 else 11); put(m,11,11,10)
+    else: # lumen: tall split prism with lit internal planes
+        line(m,8,1,13,7,o); line(m,13,7,10,14,o); line(m,10,14,5,14,o); line(m,5,14,3,8,o); line(m,3,8,8,1,o)
+        line(m,8,2,8,13,15); line(m,8,2,12,7,16); line(m,8,13,5,8,14); put(m,10,8,19); put(m,7,5,7 if phase%2 else 12); put(m,6,11,16)
     return m
 
 def hazard_frame(kind:int,state:int,phase:int=0)->list[list[int]]:
     m=blank(16,16); o=1
     if kind==0: # steam
-        rect(m,4,11,8,4,6); rect(m,6,8,4,3,2); put(m,7,9,12 if state else 5); put(m,5,12,4); put(m,10,13,4); line(m,5,14,11,14,3)
-        if state==1: line(m,7,7,10,4,12); line(m,10,4,12,2,12); put(m,5,6,12)
-        if state==2: rect(m,6,1,4,7,7); put(m,5,3,16); put(m,10,5,16); put(m,8,2,16)
+        rect(m,3,11,10,4,o); rect(m,4,11,8,3,4); rect(m,6,7,4,5,o); rect(m,7,8,2,3,8); put(m,4,13,6); put(m,11,13,6); put(m,8,10,12 if state else 5)
+        if state==1: line(m,7,7,10,4,12); line(m,10,4,12,2,12); put(m,5,7,12); put(m,12,5,12)
+        if state==2: line(m,7,7,5,2,16); line(m,8,7,10,1,7); line(m,9,7,13,4,16); put(m,4,3,16); put(m,12,6,7)
     elif kind==1: # cable
-        rect(m,2,10,12,4,2); line(m,3,11,13,11,19 if state==2 else 8); line(m,6,11,6,5,8); put(m,6,4,24 if state else 5); put(m,3,12,4); put(m,12,12,4)
-        if state==1: put(m,9,8,12); put(m,10,7,12)
-        if state==2: put(m,8,6,7); put(m,11,4,7)
+        rect(m,1,11,14,4,o); rect(m,2,12,12,2,4); line(m,3,12,12,12,8); line(m,5,12,5,5,8); line(m,5,5,8,3,8); put(m,5,5,6); put(m,3,14,6); put(m,12,14,6)
+        if state==1: put(m,9,8,12); put(m,11,6,12); put(m,12,9,12)
+        if state==2: line(m,8,7,10,5,7); line(m,10,5,12,7,7); line(m,12,7,14,4,7); put(m,8,10,19)
     else: # collapse shale
-        rect(m,2,5,12,8,4); line(m,3,6,8,10,2); line(m,11,5,8,10,2); put(m,4,11,5); put(m,12,9,5); line(m,3,13,13,13,3)
-        if state==1: put(m,4,3,12); put(m,11,3,12)
-        if state==2: line(m,8,2,8,5,7); put(m,7,3,7); put(m,9,4,7)
+        line(m,2,6,5,3,o); line(m,5,3,12,5,o); line(m,12,5,14,10,o); line(m,14,10,9,14,o); line(m,9,14,2,12,o)
+        rect(m,4,6,8,6,4); line(m,4,6,8,10,2); line(m,10,5,8,10,2); put(m,5,11,5); put(m,12,9,5)
+        if state==1: put(m,4,2,12); put(m,9,1,12); line(m,11,2,13,4,12)
+        if state==2: line(m,8,1,8,5,7); put(m,7,3,7); put(m,9,4,7); put(m,3,2,4); put(m,12,2,4)
     return m
 
 def mite_frame(state:int, phase:int)->list[list[int]]:
-    m=blank(16,16); o=1; dx=(phase%2 if state==1 else 0)
-    rect(m,5+dx,6,6,5,o); rect(m,6+dx,6,4,4,13); put(m,7+dx,7,16); put(m,9+dx,8,16); put(m,6+dx,10,4); put(m,10+dx,10,4)
-    for x in (4+dx,6+dx,10+dx): line(m,x,10,x-1,13,4)
-    line(m,6+dx,6,5+dx,4,4); line(m,9+dx,6,10+dx,4,4)
-    if state==2: line(m,5+dx,6,3+dx,3,24); line(m,10+dx,6,12+dx,3,24)
-    if state==3: line(m,5+dx,6,2+dx,5,8); put(m,3+dx,5,11)
+    m=blank(16,16); o=1; dx=(phase%3-1 if state==1 else 0)
+    # Beetle profile: segmented scrap shell, shovel forelegs and a high antenna.
+    line(m,4+dx,9,6+dx,5,o); line(m,6+dx,5,10+dx,5,o); line(m,10+dx,5,13+dx,9,o); line(m,13+dx,9,11+dx,11,o); line(m,11+dx,11,5+dx,11,o); line(m,5+dx,11,4+dx,9,o)
+    rect(m,6+dx,7,5,3,13); put(m,7+dx,6,16); put(m,10+dx,7,16); line(m,8+dx,7,8+dx,10,4); put(m,11+dx,9,4)
+    for x in (5+dx,8+dx,11+dx): line(m,x,11,x-1,14,6)
+    line(m,6+dx,6,4+dx,3,4); line(m,10+dx,6,12+dx,3,4)
+    if state==2: line(m,5+dx,7,2+dx,4,24); line(m,11+dx,7,14+dx,4,24)
+    if state==3: line(m,4+dx,9,1+dx,8,8); put(m,2+dx,8,11)
     return m
 
 def icon(kind:int)->list[list[int]]:
@@ -183,11 +201,17 @@ def build_source()->dict[str,Any]:
     layers=[]
     for i,name in enumerate(["carbide_biter","compact_thruster","copper_loop","remote_charge","cargo_frame"]):
         m=blank(32,32); # source overlays deliberately share same anchored canvas.
-        if i==0: line(m,22,13,30,16,6); line(m,22,19,30,16,6); put(m,29,16,7); put(m,25,15,4); put(m,25,18,4)
-        if i==1: rect(m,3,13,5,6,1); rect(m,4,14,3,4,4); put(m,3,16,12); put(m,5,14,6); put(m,5,18,3)
-        if i==2: line(m,10,11,20,11,8); line(m,10,11,10,20,8); line(m,10,20,20,20,8); line(m,20,11,20,20,8); put(m,10,13,12); put(m,20,18,11)
-        if i==3: rect(m,17,22,5,5,1); rect(m,18,23,3,3,8); put(m,19,22,24); put(m,18,26,4)
-        if i==4: line(m,9,22,21,22,6); line(m,10,21,10,24,6); line(m,20,21,20,24,6); line(m,11,23,19,23,3); put(m,12,24,4); put(m,18,24,4)
+        if i==0:
+            line(m,24,13,31,16,1); line(m,24,20,31,16,1); line(m,25,14,30,16,6); line(m,25,19,30,16,6); put(m,27,15,12); put(m,29,16,7); put(m,27,18,12)
+        if i==1:
+            rect(m,3,15,5,5,1); rect(m,4,16,3,3,4); line(m,7,15,7,20,6); put(m,3,17,9); put(m,2,17,12); put(m,5,16,6)
+        if i==2:
+            line(m,9,13,10,20,1); line(m,10,12,17,10,1); line(m,17,10,21,13,1); line(m,21,13,21,20,1); line(m,21,20,17,22,1); line(m,17,22,10,20,1)
+            line(m,10,13,17,11,8); line(m,17,11,20,14,8); line(m,20,14,20,19,8); line(m,20,19,17,21,8); line(m,17,21,11,19,8); put(m,11,14,12); put(m,19,18,12)
+        if i==3:
+            rect(m,18,21,5,6,1); rect(m,19,22,3,4,8); line(m,20,21,20,17,6); put(m,20,17,24); put(m,19,25,6); put(m,22,25,6)
+        if i==4:
+            line(m,8,21,8,25,6); line(m,8,25,22,25,6); line(m,22,25,22,21,6); line(m,10,22,20,22,4); put(m,11,25,5); put(m,19,25,5); line(m,9,20,21,20,1)
         layers.append((name,m))
     tiles=[(f"industrial_{n}",tile(i)) for i,n in enumerate(["solid","brittle","boundary","edge_n","edge_s","edge_w","edge_e","inner_corner","outer_corner","background","support","copper_pipe","steam_base","cable_base","collapse_shale","interactive"]) ]
     ores=[]
@@ -195,11 +219,13 @@ def build_source()->dict[str,Any]:
     hazards=[]
     for k,n in enumerate(["steam","cable","shale"]): hazards += [(f"{n}_{s}_{i:02d}",hazard_frame(k,s,i)) for s,label in enumerate(["idle","warning","active"]) for i in range(2)]
     mites=[(f"mite_{['calm','move','alert','retreat'][s]}_{i:02d}",mite_frame(s,i)) for s in range(4) for i in range(4)]
-    workshop=blank(48,32); rect(workshop,3,8,42,21,1); rect(workshop,5,10,38,17,3); rect(workshop,8,13,13,10,6); rect(workshop,25,12,14,15,4); rect(workshop,28,15,8,4,2); line(workshop,3,8,45,8,8); put(workshop,12,14,12); put(workshop,33,13,12); line(workshop,38,4,38,12,8); put(workshop,38,3,12)
-    # Bench, toolboard, pressure gauge, locker seams, roof bolts and service light.
-    rect(workshop,6,24,17,3,2); line(workshop,8,17,19,17,17); put(workshop,10,18,11); put(workshop,14,18,9); put(workshop,18,18,8)
-    rect(workshop,25,12,14,2,6); line(workshop,29,20,35,20,6); put(workshop,27,15,6); put(workshop,37,15,6); put(workshop,30,23,5); put(workshop,35,23,5)
-    line(workshop,38,3,42,3,8); rect(workshop,41,3,2,8,8); put(workshop,42,10,12); put(workshop,5,9,6); put(workshop,43,9,6); put(workshop,7,27,4); put(workshop,41,27,4)
+    # Workshop is a readable miniature location: open bay, lift rig, tool wall and boiler.
+    workshop=blank(48,32); rect(workshop,1,7,46,23,1); rect(workshop,3,9,42,19,17); rect(workshop,4,10,40,17,3)
+    rect(workshop,6,14,19,12,1); rect(workshop,8,16,15,8,2); rect(workshop,9,17,13,6,4); line(workshop,9,17,21,17,6); put(workshop,11,19,12); put(workshop,16,19,8); put(workshop,20,20,6)
+    line(workshop,5,12,27,12,8); line(workshop,7,9,7,15,6); line(workshop,25,9,25,15,6); put(workshop,7,9,7); put(workshop,25,9,7)
+    rect(workshop,29,12,12,15,1); rect(workshop,31,14,8,11,4); line(workshop,32,16,38,16,6); line(workshop,32,22,38,22,3); put(workshop,33,18,12); put(workshop,38,19,6)
+    line(workshop,39,4,39,12,8); line(workshop,39,4,45,4,8); rect(workshop,43,4,2,7,8); put(workshop,44,10,12)
+    line(workshop,3,28,44,28,6); put(workshop,5,10,6); put(workshop,42,10,6); put(workshop,5,27,5); put(workshop,42,27,5)
     icons=[(n,icon(i)) for i,n in enumerate(["scrap","core","data","chronoshard","durability","energy","heat","cargo","sonar","beacon","blast_pin"])]
     return {"format":"time_strata_artgen.v1","palette":PALETTE,"assets":[frames_named("drill_default",32,32,drill,10),frames_named("modules_default",32,32,layers,0),frames_named("industrial_tiles",16,16,tiles,0),frames_named("industrial_ores",16,16,ores,8),frames_named("industrial_hazards",16,16,hazards,8),frames_named("scrap_mite",16,16,mites,8),frames_named("workshop_l1",48,32,[('workshop_l1',workshop)],0),frames_named("ui_icons",16,16,icons,0)]}
 
@@ -215,74 +241,58 @@ def render_asset(asset:dict[str,Any])->tuple[Image.Image,dict[str,Any]]:
     return sheet,{"id":asset["id"],"frame_size":asset["frame_size"],"fps":asset["fps"],"frames":meta}
 
 def make_scene(source:dict[str,Any])->Image.Image:
+    # Rebuilt as a playable horizontal mine cut, not a gallery of unrelated parts.
     im=Image.new("RGBA",(640,360),RGB[1]); px=im.load()
-    # Coal-rock walls with hard stepped bands and warm practical light pools.
     for y in range(360):
         for x in range(640):
-            px[x,y]=RGB[2 if (x//32+y//24)%3 else 3]
+            band = 2 if y < 210 else 1
+            px[x,y]=RGB[band]
+    # Ceiling mass and rear strata: deliberately irregular 16px clusters.
     for x in range(0,640,16):
-        for y in range(0,360,16):
-            if (x//16*3+y//16*5)%11==0: px[x+4,y+5]=RGB[4]
-            if x+10 < 640 and y+12 < 360 and (x//16*7+y//16*2)%19==0: px[x+10,y+12]=RGB[5]
-    # Tunnel negative space: distant girders, floor gratings and stepped rock ceiling.
-    rect_scene(im,0,238,640,122,1); rect_scene(im,0,245,640,5,6); rect_scene(im,0,254,640,4,4)
-    for x in range(8,640,32):
-        rect_scene(im,x,258,18,3,3); rect_scene(im,x+3,262,2,6,5); rect_scene(im,x+13,262,2,6,5)
-    for x in range(0,640,48):
-        line_scene(im,x,202,x+24,190,3); line_scene(im,x+24,190,x+48,202,3)
-        put_scene(im,x+24,190,5)
-    # Boiler and archive machinery in the deepest parallax plane.
-    rect_scene(im,290,82,92,94,1); rect_scene(im,298,90,76,78,17)
-    rect_scene(im,306,98,60,6,3); rect_scene(im,312,112,48,36,2); rect_scene(im,320,120,32,20,1)
-    for x,y in [(304,96),(366,96),(308,164),(362,164),(322,108),(350,108)]: put_scene(im,x,y,6)
-    rect_scene(im,334,125,5,12,8); put_scene(im,336,123,12); line_scene(im,336,137,350,150,8)
-    for x in (40,180,440,560):
-        rect_scene(im,x,70,8,175,6); rect_scene(im,x-8,76,24,6,8)
-    for x in range(20,620,96):
-        line_scene(im,x,108,x+64,108,8); line_scene(im,x+64,108,x+64,184,8)
-        rect_scene(im,x+16,105,5,6,6); rect_scene(im,x+17,106,2,2,7)
-    # Layered overhead copper service pipe with joints, valves and condensate marks.
-    line_scene(im,8,145,150,145,8); line_scene(im,150,145,150,165,8); line_scene(im,150,165,282,165,8)
-    line_scene(im,282,165,282,134,8); line_scene(im,282,134,420,134,8)
-    for x,y in [(52,145),(150,151),(215,165),(282,150),(360,134)]:
-        rect_scene(im,x-2,y-2,5,5,11); put_scene(im,x,y,12)
-    for x,y in [(170,180),(173,184),(347,152),(350,156)]: put_scene(im,x,y,5)
-    for x,y in [(90,82),(330,65),(535,120)]:
-        rect_scene(im,x,y,4,13,6); rect_scene(im,x-4,y+13,12,8,12); rect_scene(im,x-1,y+15,6,4,7)
-        # Hard-edged lamp spill; ordered dots preserve pixel language.
-        for dx,dy in [(-10,22),(10,22),(-18,29),(18,29),(-28,37),(28,37)]: put_scene(im,x+dx,y+dy,11)
-    # Foreground cable bundle and a toothed drilled wall; nearer values remain dark.
-    for offset,c in [(0,1),(4,3),(8,4)]:
-        line_scene(im,0,216+offset,112,216+offset,c); line_scene(im,112,216+offset,150,236+offset,c)
-    for y in range(176,240,12):
-        line_scene(im,326,y,348,y+6,6); put_scene(im,346,y+6,1)
-    # tile strip, ores, hazards and mite use actual source pixels scaled 4.
+        roof=58 + ((x//16*11)%5)*7
+        rect_scene(im,x,0,16,roof,3 if (x//16)%3 else 2)
+        line_scene(im,x,roof-3,x+15,roof-3,4)
+        if (x//16)%4==0: put_scene(im,x+5,roof-10,5)
+    for x in range(24,620,52):
+        line_scene(im,x,84,x+20,101,17); line_scene(im,x+20,101,x+41,90,17); put_scene(im,x+21,101,4)
+    # Large rear boiler silhouette offsets the warm narrative focus from the player.
+    rect_scene(im,414,92,112,153,1); rect_scene(im,423,102,94,135,17); rect_scene(im,430,111,80,8,3)
+    rect_scene(im,438,126,64,73,2); rect_scene(im,448,136,44,44,1); rect_scene(im,454,142,31,28,3)
+    line_scene(im,470,142,470,173,8); line_scene(im,470,173,490,184,8); put_scene(im,470,142,12)
+    for x,y in [(429,108),(512,108),(430,232),(510,232),(441,203),(500,203)]: put_scene(im,x,y,6)
+    # Industrial supports and pipe arteries frame a clear central travel lane.
+    for x in (78,286,560):
+        rect_scene(im,x,65,10,205,1); rect_scene(im,x+2,67,6,198,6); rect_scene(im,x-8,69,26,7,8)
+        line_scene(im,x-8,264,x+18,264,4); put_scene(im,x+3,70,7); put_scene(im,x+3,255,5)
+    line_scene(im,0,130,132,130,8); line_scene(im,132,130,132,164,8); line_scene(im,132,164,272,164,8); line_scene(im,272,164,272,118,8); line_scene(im,272,118,398,118,8)
+    for x,y in [(34,130),(132,145),(204,164),(272,143),(345,118)]:
+        rect_scene(im,x-3,y-3,7,7,10); put_scene(im,x,y,12)
+    # Hard-edged lamp pools: sparse brighter pixels, never a gradient.
+    for x,y in [(124,92),(310,79),(548,104)]:
+        rect_scene(im,x,y,4,15,6); rect_scene(im,x-5,y+15,14,8,12); rect_scene(im,x-1,y+17,6,4,7)
+        for dx,dy in [(-14,25),(14,25),(-27,34),(27,34),(-38,44),(38,44)]: put_scene(im,x+dx,y+dy,11)
+    # tile strip, ores, hazards and mite use the generated source art in a real tunnel layout.
     assets={a['id']:a for a in source['assets']}
     tileasset=assets['industrial_tiles'];
-    for i in range(8): im.alpha_composite(to_image(tileasset['frames'][i]['pixels']).resize((64,64),Image.Resampling.NEAREST),(i*64,250))
+    floor_order=[0,1,0,10,0,0,14,0,1,10]
+    for i,k in enumerate(floor_order): im.alpha_composite(to_image(tileasset['frames'][k]['pixels']).resize((64,64),Image.Resampling.NEAREST),(i*64,277))
+    for i,k in enumerate([3,0,0,0,0,0,0,0,0,6]): im.alpha_composite(to_image(tileasset['frames'][k]['pixels']).resize((48,48),Image.Resampling.NEAREST),(i*64,226))
     oreasset=assets['industrial_ores'];
-    for i in range(3): im.alpha_composite(to_image(oreasset['frames'][i*4+1]['pixels']).resize((48,48),Image.Resampling.NEAREST),(355+i*55,188))
-    haz=assets['industrial_hazards']; im.alpha_composite(to_image(haz['frames'][4]['pixels']).resize((64,64),Image.Resampling.NEAREST),(520,183)); im.alpha_composite(to_image(haz['frames'][10]['pixels']).resize((64,64),Image.Resampling.NEAREST),(590,183))
-    im.alpha_composite(to_image(assets['scrap_mite']['frames'][5]['pixels']).resize((48,48),Image.Resampling.NEAREST),(450,205))
-    # drilling rig
-    im.alpha_composite(to_image(assets['drill_default']['frames'][10]['pixels']).resize((128,128),Image.Resampling.NEAREST),(190,155))
-    # Drilling contact: hard sparks, carbide dust and a stepped steam plume.
-    for x,y,c in [(314,213,12),(322,208,7),(329,216,11),(318,224,8),(337,220,12),(346,226,5),(352,216,16),(360,210,16),(368,215,7)]: put_scene(im,x,y,c)
-    for x,y,c in [(272,148,16),(278,142,5),(284,148,16),(288,153,5),(280,158,4)]: put_scene(im,x,y,c)
-    # HUD bands: icon sockets, segmented bars and non-text directional pips.
-    rect_scene(im,14,14,215,48,1); rect_scene(im,18,18,207,40,3)
+    for i,(x,y) in enumerate([(180,219),(365,226),(514,223)]): im.alpha_composite(to_image(oreasset['frames'][i*4+1]['pixels']).resize((48,48),Image.Resampling.NEAREST),(x,y))
+    haz=assets['industrial_hazards']; im.alpha_composite(to_image(haz['frames'][4]['pixels']).resize((56,56),Image.Resampling.NEAREST),(530,217)); im.alpha_composite(to_image(haz['frames'][10]['pixels']).resize((56,56),Image.Resampling.NEAREST),(82,217))
+    im.alpha_composite(to_image(assets['scrap_mite']['frames'][5]['pixels']).resize((52,52),Image.Resampling.NEAREST),(472,238))
+    # Drilling rig occupies the lane; foreground wall makes the drill contact legible.
+    im.alpha_composite(to_image(assets['drill_default']['frames'][10]['pixels']).resize((160,160),Image.Resampling.NEAREST),(215,164))
+    for x,y,c in [(362,241,12),(370,235,7),(378,246,11),(389,239,12),(396,251,5),(404,240,16),(413,246,7)]: put_scene(im,x,y,c)
+    for x,y,c in [(388,203,16),(395,194,5),(403,205,16),(409,212,5),(397,216,4)]: put_scene(im,x,y,c)
+    # HUD: compact tool readout that leaves the tunnel visually dominant.
+    rect_scene(im,14,14,207,45,1); rect_scene(im,18,18,199,37,17); line_scene(im,20,54,214,54,6)
+    iconasset=assets['ui_icons']
     for i,c in enumerate([24,19,9,11]):
-        rect_scene(im,26+i*47,29,38,12,1); rect_scene(im,29+i*47,32,32,6,c); put_scene(im,31+i*47,33,7)
-        rect_scene(im,28+i*47,21,12,5,17); put_scene(im,31+i*47,22,c)
-    for x in range(22,220,16): put_scene(im,x,51,5)
-    rect_scene(im,478,14,148,48,1); rect_scene(im,482,18,140,40,3); rect_scene(im,490,28,120,14,1); rect_scene(im,493,31,114,8,12)
-    for x in range(495,607,12): put_scene(im,x,34,7)
-    rect_scene(im,486,47,32,5,18); rect_scene(im,524,47,32,5,19); rect_scene(im,562,47,32,5,24)
-    # Corner brackets and a compact tool belt make the HUD read as an assembled device.
-    for x,y in [(18,18),(220,18),(18,54),(220,54),(482,18),(620,18),(482,54),(620,54)]:
-        rect_scene(im,x,y,4,2,6); rect_scene(im,x,y,2,4,6)
-    for i,c in enumerate([19,12,24,11,15]):
-        rect_scene(im,610-i*16,66,12,12,1); rect_scene(im,613-i*16,69,6,6,c)
+        rect_scene(im,28+i*45,29,35,12,1); rect_scene(im,31+i*45,32,29,6,c); put_scene(im,33+i*45,33,7)
+        im.alpha_composite(to_image(iconasset['frames'][4+i]['pixels']).resize((12,12),Image.Resampling.NEAREST),(29+i*45,20))
+    rect_scene(im,500,14,126,45,1); rect_scene(im,504,18,118,37,3); rect_scene(im,511,28,103,10,1); rect_scene(im,514,31,97,4,12)
+    for i,c in enumerate([19,12,24,11,15]): rect_scene(im,610-i*17,67,12,12,1); rect_scene(im,613-i*17,70,6,6,c)
     return im
 
 def rect_scene(im:Image.Image,x:int,y:int,w:int,h:int,c:int)->None:
