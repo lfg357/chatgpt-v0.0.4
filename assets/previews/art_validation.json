@@ -16,7 +16,7 @@
       "dimensions_ok": true,
       "anchors_ok": true,
       "spriteframes_ok": true,
-      "sha256": "450224a0883066274c0a6f7bf51baa5ca5c1648feb792d0428bd7bce761cb7ae"
+      "sha256": "673564c5add71e73424fb6ae0007903eb784ff24b506eddf97dff7c577560d64"
     },
     "modules_default": {
       "size": [
@@ -33,7 +33,7 @@
       "dimensions_ok": true,
       "anchors_ok": true,
       "spriteframes_ok": true,
-      "sha256": "c0648a6636d8c1ec748f8a6e264a0fb06e6b5c2eeb186c96a4504f27c2fd3fe1"
+      "sha256": "dd4aa64a1a8f2b9f99db41a00bd2e9decec8b3563daf2c04732269b9ea8e25c9"
     },
     "industrial_tiles": {
       "size": [
@@ -50,7 +50,7 @@
       "dimensions_ok": true,
       "anchors_ok": true,
       "spriteframes_ok": true,
-      "sha256": "8ea39d5f02baf0f3e72f0b4541bb17d0e4be3bc61294eccff1f96e2bbbb1aef5"
+      "sha256": "74003518c086e7bbf10d62b31b763743e836810d2c5134be80e583f155014189"
     },
     "industrial_ores": {
       "size": [
@@ -67,7 +67,7 @@
       "dimensions_ok": true,
       "anchors_ok": true,
       "spriteframes_ok": true,
-      "sha256": "12ca25d44e5111280d42abd7743697fedc6788fbace9d4d606c5fa3ff1cb0d68"
+      "sha256": "3d0d6b469a681178a9c7a220dcb0e8e44c767cacc281785ef25392d462d35bd4"
     },
     "industrial_hazards": {
       "size": [
@@ -84,7 +84,7 @@
       "dimensions_ok": true,
       "anchors_ok": true,
       "spriteframes_ok": true,
-      "sha256": "35a4101096d36cf100d1901813388ef6d1cec1c6748eb289f6ba7012db2079ee"
+      "sha256": "792b5d27ff141b8b3598e984fc80b72bf470a83e3aee1c9d8b44c5c9e0807582"
     },
     "scrap_mite": {
       "size": [
@@ -101,7 +101,7 @@
       "dimensions_ok": true,
       "anchors_ok": true,
       "spriteframes_ok": true,
-      "sha256": "a7efc3fe083fe6e72cc03c6f56f237cccca424fdfd80f41fbc5c06b7ae7cd8b4"
+      "sha256": "0d71915e4c552232e02b7281a139d6c70ffcbedec8c1c7729583949a9b628121"
     },
     "workshop_l1": {
       "size": [
@@ -118,7 +118,7 @@
       "dimensions_ok": true,
       "anchors_ok": true,
       "spriteframes_ok": true,
-      "sha256": "6e1f7f7c777b0adf899a5e074ad06cf2a12cee08238239baea0d062332584f76"
+      "sha256": "a14545a782c059fa1c98b129f564eedcaa06b4b198d88e94cb64a52df4d0a623"
     },
     "ui_icons": {
       "size": [
