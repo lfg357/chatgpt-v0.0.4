@@ -244,49 +244,51 @@ def make_scene(source:dict[str,Any])->Image.Image:
     # Author the screenshot at the actual game resolution, then only nearest-scale it.
     # It must read as a playable moment before any asset contact sheet is consulted.
     im=Image.new("RGBA",(320,180),RGB[1]); px=im.load()
-    for y in range(180):
-        for x in range(320): px[x,y]=RGB[2 if y < 142 else 1]
     assets={a['id']:a for a in source['assets']}; tiles=assets['industrial_tiles']; ores=assets['industrial_ores']; hazards=assets['industrial_hazards']
     def stamp(asset:dict[str,Any], index:int, x:int, y:int, scale:int=1)->None:
         src=to_image(asset['frames'][index]['pixels'])
         if scale != 1: src=src.resize((src.width*scale,src.height*scale),Image.Resampling.NEAREST)
         im.alpha_composite(src,(x,y))
-    # Deep rock ceiling and side walls leave a single wide route across the centre.
-    for tx in range(20):
-        roof=22 + (tx*7 % 3)*5
-        stamp(tiles,9,tx*16,roof-16)
-        if tx in (1,6,12,17): stamp(tiles,10,tx*16,roof)
-    for ty in range(5,9): stamp(tiles,5,0,ty*16); stamp(tiles,6,304,ty*16)
-    # A varied ground prevents the repeated-tile sample-strip look.
+    # Far layer: dark, low-contrast factory silhouettes and horizontal strata only.
+    for x in range(0,320,20):
+        h=24 + ((x//20*5)%3)*6
+        rect_scene(im,x,18,16,h,2); rect_scene(im,x+3,22,10,h-8,17)
+        line_scene(im,x+3,24,x+12,24,3); put_scene(im,x+6,31,4)
+    for x in range(10,310,36): line_scene(im,x,98,x+18,92,17); line_scene(im,x+18,92,x+31,98,17)
+    # Mid layer: a narrow tunnel lane with two structural bays.
+    for x in (48,224):
+        rect_scene(im,x,38,6,101,1); rect_scene(im,x+1,40,4,96,5); rect_scene(im,x-7,40,20,5,8)
+        rect_scene(im,x-6,136,18,4,4); put_scene(im,x+2,41,7); put_scene(im,x+2,134,6)
+    # Sparse copper run; it guides the eye rightward to the threat instead of filling the frame.
+    line_scene(im,0,78,96,78,8); line_scene(im,96,78,96,94,8); line_scene(im,96,94,150,94,8)
+    for x,y in [(20,78),(72,78),(96,87),(128,94)]: rect_scene(im,x-1,y-1,3,3,10); put_scene(im,x,y,12)
+    # Foreground ceiling and floor: black outline separates them sharply from the mid layer.
+    roof=[9,9,3,9,10,9,9,3,9,9,10,9,3,9,9,10,9,9,3,9]
+    for tx,k in enumerate(roof): stamp(tiles,k,tx*16,0)
     ground=[0,0,1,0,10,0,14,0,0,1,0,11,0,10,0,0,1,0,14,0]
-    for tx,k in enumerate(ground): stamp(tiles,k,tx*16,140)
-    for tx,k in enumerate([9,9,0,0,9,9,0,0,9,9,0,0,9,9,0,0,9,9,0,0]): stamp(tiles,k,tx*16,124)
-    # Three supports make depth and rhythm; their lamps guide the player toward the drill.
-    for x in (40,160,272):
-        rect_scene(im,x,34,4,104,6); rect_scene(im,x-5,36,14,4,8); put_scene(im,x+1,36,7)
-    for x,y in [(71,55),(185,50),(251,68)]:
-        rect_scene(im,x,y,2,12,6); rect_scene(im,x-3,y+12,8,5,12); put_scene(im,x-1,y+14,7)
-        for dx,dy in [(-8,21),(8,21),(-15,28),(15,28)]: put_scene(im,x+dx,y+dy,11)
-    # A single pipe has joints and a purposeful route instead of a web of unrelated lines.
-    line_scene(im,3,82,105,82,8); line_scene(im,105,82,105,98,8); line_scene(im,105,98,150,98,8)
-    for x,y in [(20,82),(75,82),(105,90),(130,98)]: rect_scene(im,x-1,y-1,3,3,10); put_scene(im,x,y,12)
-    # Rear boiler is quiet and dark; it supports the scene rather than competing with the player.
-    rect_scene(im,226,58,52,63,1); rect_scene(im,229,61,46,57,17); rect_scene(im,233,66,38,6,3)
-    rect_scene(im,238,74,27,31,2); rect_scene(im,244,80,15,17,1); line_scene(im,251,80,251,100,8); put_scene(im,251,80,12)
-    for x,y in [(230,63),(273,63),(231,116),(272,116)]: put_scene(im,x,y,6)
-    # One clear gameplay choice: drill through brittle wall; crystal + steam sit ahead.
-    stamp(ores,1,184,117); stamp(ores,5,214,119); stamp(hazards,4,244,109); stamp(assets['scrap_mite'],5,205,126)
-    stamp(assets['drill_default'],10,112,108)
-    for x,y,c in [(144,124,12),(149,120,7),(153,127,11),(158,121,12),(162,126,5),(166,119,16)]: put_scene(im,x,y,c)
-    # Minimal lower HUD: grouped vitals left, tools right, no top-of-screen competition.
-    rect_scene(im,8,157,126,17,1); rect_scene(im,10,159,122,13,17)
+    for tx,k in enumerate(ground): stamp(tiles,k,tx*16,124)
+    for tx,k in enumerate([9,0,0,9,0,0,9,0,0,9,0,0,9,0,0,9,0,0,9,0]): stamp(tiles,k,tx*16,140)
+    for ty in range(4,8): stamp(tiles,5,0,ty*16); stamp(tiles,6,304,ty*16)
+    # Warm lights are limited to two route markers, producing a deliberate warm/cold contrast.
+    for x,y in [(82,54),(186,62)]:
+        rect_scene(im,x,y,2,13,6); rect_scene(im,x-3,y+13,8,5,12); put_scene(im,x-1,y+15,7)
+        for dx,dy in [(-5,20),(5,20),(-11,27),(11,27)]: put_scene(im,x+dx,y+dy,11)
+    # Quiet distant boiler: bluer, flatter, and partly occluded by the playable foreground.
+    rect_scene(im,250,62,38,55,17); rect_scene(im,253,66,32,47,2); rect_scene(im,257,70,24,4,3); rect_scene(im,262,78,14,24,1)
+    line_scene(im,269,79,269,102,8); put_scene(im,269,79,12); put_scene(im,255,110,4); put_scene(im,283,110,4)
+    # One clear action sequence: drill -> debris -> brittle wall -> ore/hazard choice.
+    stamp(assets['drill_default'],10,112,94)
+    for x,y,c in [(144,111,12),(149,108,7),(153,114,11),(158,109,12),(162,115,5),(166,108,16)]: put_scene(im,x,y,c)
+    stamp(tiles,1,168,108); stamp(ores,1,188,108); stamp(ores,5,213,109); stamp(hazards,4,244,100); stamp(assets['scrap_mite'],5,205,119)
+    # Readable HUD: a separate status rail, with each icon physically bound to one meter.
+    rect_scene(im,0,152,320,28,1); rect_scene(im,3,154,314,23,6); rect_scene(im,5,156,310,19,3); line_scene(im,5,156,315,156,4)
     for i,c in enumerate([24,19,9,11]):
-        stamp(assets['ui_icons'],4+i,14+i*29,161)
-        rect_scene(im,25+i*29,164,14,4,1); rect_scene(im,26+i*29,165,10,2,c)
-    rect_scene(im,246,157,66,17,1); rect_scene(im,248,159,62,13,3)
+        stamp(assets['ui_icons'],4+i,10+i*53,158)
+        rect_scene(im,27+i*53,162,28,7,1); rect_scene(im,29+i*53,164,21,3,c); put_scene(im,31+i*53,164,7)
+        if i < 3: line_scene(im,61+i*53,159,61+i*53,172,1)
     for i,c in enumerate([19,12,24]):
-        stamp(assets['ui_icons'],8+i,252+i*18,161)
-        put_scene(im,264+i*18,170,c)
+        stamp(assets['ui_icons'],8+i,244+i*23,158)
+        rect_scene(im,244+i*23,171,16,3,1); rect_scene(im,246+i*23,172,12,1,c)
     return im.resize((640,360),Image.Resampling.NEAREST)
 
 def rect_scene(im:Image.Image,x:int,y:int,w:int,h:int,c:int)->None:
