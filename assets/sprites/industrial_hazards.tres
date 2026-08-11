@@ -1,0 +1,88 @@
+[gd_resource type="SpriteFrames" load_steps=19 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/industrial_hazards.png" id="1_sheet"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_000"]
+atlas = ExtResource("1_sheet")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_001"]
+atlas = ExtResource("1_sheet")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_002"]
+atlas = ExtResource("1_sheet")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_003"]
+atlas = ExtResource("1_sheet")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_004"]
+atlas = ExtResource("1_sheet")
+region = Rect2(64, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_005"]
+atlas = ExtResource("1_sheet")
+region = Rect2(80, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_006"]
+atlas = ExtResource("1_sheet")
+region = Rect2(96, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_007"]
+atlas = ExtResource("1_sheet")
+region = Rect2(112, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_008"]
+atlas = ExtResource("1_sheet")
+region = Rect2(0, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_009"]
+atlas = ExtResource("1_sheet")
+region = Rect2(16, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_010"]
+atlas = ExtResource("1_sheet")
+region = Rect2(32, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_011"]
+atlas = ExtResource("1_sheet")
+region = Rect2(48, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_012"]
+atlas = ExtResource("1_sheet")
+region = Rect2(64, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_013"]
+atlas = ExtResource("1_sheet")
+region = Rect2(80, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_014"]
+atlas = ExtResource("1_sheet")
+region = Rect2(96, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_015"]
+atlas = ExtResource("1_sheet")
+region = Rect2(112, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_016"]
+atlas = ExtResource("1_sheet")
+region = Rect2(0, 32, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_017"]
+atlas = ExtResource("1_sheet")
+region = Rect2(16, 32, 16, 16)
+
+[resource]
+animations = [
+{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_000")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_001")}], "loop": true, "name": &"steam_0", "speed": 8},
+{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_002")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_003")}], "loop": true, "name": &"steam_1", "speed": 8},
+{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_004")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_005")}], "loop": true, "name": &"steam_2", "speed": 8},
+{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_006")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_007")}], "loop": true, "name": &"cable_0", "speed": 8},
+{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_008")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_009")}], "loop": true, "name": &"cable_1", "speed": 8},
+{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_010")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_011")}], "loop": true, "name": &"cable_2", "speed": 8},
+{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_012")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_013")}], "loop": true, "name": &"shale_0", "speed": 8},
+{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_014")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_015")}], "loop": true, "name": &"shale_1", "speed": 8},
+{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_016")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_017")}], "loop": true, "name": &"shale_2", "speed": 8}
+]
