@@ -241,59 +241,53 @@ def render_asset(asset:dict[str,Any])->tuple[Image.Image,dict[str,Any]]:
     return sheet,{"id":asset["id"],"frame_size":asset["frame_size"],"fps":asset["fps"],"frames":meta}
 
 def make_scene(source:dict[str,Any])->Image.Image:
-    # Rebuilt as a playable horizontal mine cut, not a gallery of unrelated parts.
-    im=Image.new("RGBA",(640,360),RGB[1]); px=im.load()
-    for y in range(360):
-        for x in range(640):
-            band = 2 if y < 210 else 1
-            px[x,y]=RGB[band]
-    # Ceiling mass and rear strata: deliberately irregular 16px clusters.
-    for x in range(0,640,16):
-        roof=58 + ((x//16*11)%5)*7
-        rect_scene(im,x,0,16,roof,3 if (x//16)%3 else 2)
-        line_scene(im,x,roof-3,x+15,roof-3,4)
-        if (x//16)%4==0: put_scene(im,x+5,roof-10,5)
-    for x in range(24,620,52):
-        line_scene(im,x,84,x+20,101,17); line_scene(im,x+20,101,x+41,90,17); put_scene(im,x+21,101,4)
-    # Large rear boiler silhouette offsets the warm narrative focus from the player.
-    rect_scene(im,414,92,112,153,1); rect_scene(im,423,102,94,135,17); rect_scene(im,430,111,80,8,3)
-    rect_scene(im,438,126,64,73,2); rect_scene(im,448,136,44,44,1); rect_scene(im,454,142,31,28,3)
-    line_scene(im,470,142,470,173,8); line_scene(im,470,173,490,184,8); put_scene(im,470,142,12)
-    for x,y in [(429,108),(512,108),(430,232),(510,232),(441,203),(500,203)]: put_scene(im,x,y,6)
-    # Industrial supports and pipe arteries frame a clear central travel lane.
-    for x in (78,286,560):
-        rect_scene(im,x,65,10,205,1); rect_scene(im,x+2,67,6,198,6); rect_scene(im,x-8,69,26,7,8)
-        line_scene(im,x-8,264,x+18,264,4); put_scene(im,x+3,70,7); put_scene(im,x+3,255,5)
-    line_scene(im,0,130,132,130,8); line_scene(im,132,130,132,164,8); line_scene(im,132,164,272,164,8); line_scene(im,272,164,272,118,8); line_scene(im,272,118,398,118,8)
-    for x,y in [(34,130),(132,145),(204,164),(272,143),(345,118)]:
-        rect_scene(im,x-3,y-3,7,7,10); put_scene(im,x,y,12)
-    # Hard-edged lamp pools: sparse brighter pixels, never a gradient.
-    for x,y in [(124,92),(310,79),(548,104)]:
-        rect_scene(im,x,y,4,15,6); rect_scene(im,x-5,y+15,14,8,12); rect_scene(im,x-1,y+17,6,4,7)
-        for dx,dy in [(-14,25),(14,25),(-27,34),(27,34),(-38,44),(38,44)]: put_scene(im,x+dx,y+dy,11)
-    # tile strip, ores, hazards and mite use the generated source art in a real tunnel layout.
-    assets={a['id']:a for a in source['assets']}
-    tileasset=assets['industrial_tiles'];
-    floor_order=[0,1,0,10,0,0,14,0,1,10]
-    for i,k in enumerate(floor_order): im.alpha_composite(to_image(tileasset['frames'][k]['pixels']).resize((64,64),Image.Resampling.NEAREST),(i*64,277))
-    for i,k in enumerate([3,0,0,0,0,0,0,0,0,6]): im.alpha_composite(to_image(tileasset['frames'][k]['pixels']).resize((48,48),Image.Resampling.NEAREST),(i*64,226))
-    oreasset=assets['industrial_ores'];
-    for i,(x,y) in enumerate([(180,219),(365,226),(514,223)]): im.alpha_composite(to_image(oreasset['frames'][i*4+1]['pixels']).resize((48,48),Image.Resampling.NEAREST),(x,y))
-    haz=assets['industrial_hazards']; im.alpha_composite(to_image(haz['frames'][4]['pixels']).resize((56,56),Image.Resampling.NEAREST),(530,217)); im.alpha_composite(to_image(haz['frames'][10]['pixels']).resize((56,56),Image.Resampling.NEAREST),(82,217))
-    im.alpha_composite(to_image(assets['scrap_mite']['frames'][5]['pixels']).resize((52,52),Image.Resampling.NEAREST),(472,238))
-    # Drilling rig occupies the lane; foreground wall makes the drill contact legible.
-    im.alpha_composite(to_image(assets['drill_default']['frames'][10]['pixels']).resize((160,160),Image.Resampling.NEAREST),(215,164))
-    for x,y,c in [(362,241,12),(370,235,7),(378,246,11),(389,239,12),(396,251,5),(404,240,16),(413,246,7)]: put_scene(im,x,y,c)
-    for x,y,c in [(388,203,16),(395,194,5),(403,205,16),(409,212,5),(397,216,4)]: put_scene(im,x,y,c)
-    # HUD: compact tool readout that leaves the tunnel visually dominant.
-    rect_scene(im,14,14,207,45,1); rect_scene(im,18,18,199,37,17); line_scene(im,20,54,214,54,6)
-    iconasset=assets['ui_icons']
+    # Author the screenshot at the actual game resolution, then only nearest-scale it.
+    # It must read as a playable moment before any asset contact sheet is consulted.
+    im=Image.new("RGBA",(320,180),RGB[1]); px=im.load()
+    for y in range(180):
+        for x in range(320): px[x,y]=RGB[2 if y < 142 else 1]
+    assets={a['id']:a for a in source['assets']}; tiles=assets['industrial_tiles']; ores=assets['industrial_ores']; hazards=assets['industrial_hazards']
+    def stamp(asset:dict[str,Any], index:int, x:int, y:int, scale:int=1)->None:
+        src=to_image(asset['frames'][index]['pixels'])
+        if scale != 1: src=src.resize((src.width*scale,src.height*scale),Image.Resampling.NEAREST)
+        im.alpha_composite(src,(x,y))
+    # Deep rock ceiling and side walls leave a single wide route across the centre.
+    for tx in range(20):
+        roof=22 + (tx*7 % 3)*5
+        stamp(tiles,9,tx*16,roof-16)
+        if tx in (1,6,12,17): stamp(tiles,10,tx*16,roof)
+    for ty in range(5,9): stamp(tiles,5,0,ty*16); stamp(tiles,6,304,ty*16)
+    # A varied ground prevents the repeated-tile sample-strip look.
+    ground=[0,0,1,0,10,0,14,0,0,1,0,11,0,10,0,0,1,0,14,0]
+    for tx,k in enumerate(ground): stamp(tiles,k,tx*16,140)
+    for tx,k in enumerate([9,9,0,0,9,9,0,0,9,9,0,0,9,9,0,0,9,9,0,0]): stamp(tiles,k,tx*16,124)
+    # Three supports make depth and rhythm; their lamps guide the player toward the drill.
+    for x in (40,160,272):
+        rect_scene(im,x,34,4,104,6); rect_scene(im,x-5,36,14,4,8); put_scene(im,x+1,36,7)
+    for x,y in [(71,55),(185,50),(251,68)]:
+        rect_scene(im,x,y,2,12,6); rect_scene(im,x-3,y+12,8,5,12); put_scene(im,x-1,y+14,7)
+        for dx,dy in [(-8,21),(8,21),(-15,28),(15,28)]: put_scene(im,x+dx,y+dy,11)
+    # A single pipe has joints and a purposeful route instead of a web of unrelated lines.
+    line_scene(im,3,82,105,82,8); line_scene(im,105,82,105,98,8); line_scene(im,105,98,150,98,8)
+    for x,y in [(20,82),(75,82),(105,90),(130,98)]: rect_scene(im,x-1,y-1,3,3,10); put_scene(im,x,y,12)
+    # Rear boiler is quiet and dark; it supports the scene rather than competing with the player.
+    rect_scene(im,226,58,52,63,1); rect_scene(im,229,61,46,57,17); rect_scene(im,233,66,38,6,3)
+    rect_scene(im,238,74,27,31,2); rect_scene(im,244,80,15,17,1); line_scene(im,251,80,251,100,8); put_scene(im,251,80,12)
+    for x,y in [(230,63),(273,63),(231,116),(272,116)]: put_scene(im,x,y,6)
+    # One clear gameplay choice: drill through brittle wall; crystal + steam sit ahead.
+    stamp(ores,1,184,117); stamp(ores,5,214,119); stamp(hazards,4,244,109); stamp(assets['scrap_mite'],5,205,126)
+    stamp(assets['drill_default'],10,112,108)
+    for x,y,c in [(144,124,12),(149,120,7),(153,127,11),(158,121,12),(162,126,5),(166,119,16)]: put_scene(im,x,y,c)
+    # Minimal lower HUD: grouped vitals left, tools right, no top-of-screen competition.
+    rect_scene(im,8,157,126,17,1); rect_scene(im,10,159,122,13,17)
     for i,c in enumerate([24,19,9,11]):
-        rect_scene(im,28+i*45,29,35,12,1); rect_scene(im,31+i*45,32,29,6,c); put_scene(im,33+i*45,33,7)
-        im.alpha_composite(to_image(iconasset['frames'][4+i]['pixels']).resize((12,12),Image.Resampling.NEAREST),(29+i*45,20))
-    rect_scene(im,500,14,126,45,1); rect_scene(im,504,18,118,37,3); rect_scene(im,511,28,103,10,1); rect_scene(im,514,31,97,4,12)
-    for i,c in enumerate([19,12,24,11,15]): rect_scene(im,610-i*17,67,12,12,1); rect_scene(im,613-i*17,70,6,6,c)
-    return im
+        stamp(assets['ui_icons'],4+i,14+i*29,161)
+        rect_scene(im,25+i*29,164,14,4,1); rect_scene(im,26+i*29,165,10,2,c)
+    rect_scene(im,246,157,66,17,1); rect_scene(im,248,159,62,13,3)
+    for i,c in enumerate([19,12,24]):
+        stamp(assets['ui_icons'],8+i,252+i*18,161)
+        put_scene(im,264+i*18,170,c)
+    return im.resize((640,360),Image.Resampling.NEAREST)
 
 def rect_scene(im:Image.Image,x:int,y:int,w:int,h:int,c:int)->None:
     for yy in range(y,y+h):
