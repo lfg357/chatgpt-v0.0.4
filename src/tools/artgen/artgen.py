@@ -223,6 +223,7 @@ def make_scene(source:dict[str,Any])->Image.Image:
     for x in range(0,640,16):
         for y in range(0,360,16):
             if (x//16*3+y//16*5)%11==0: px[x+4,y+5]=RGB[4]
+            if x+10 < 640 and y+12 < 360 and (x//16*7+y//16*2)%19==0: px[x+10,y+12]=RGB[5]
     # Tunnel negative space: distant girders, floor gratings and stepped rock ceiling.
     rect_scene(im,0,238,640,122,1); rect_scene(im,0,245,640,5,6); rect_scene(im,0,254,640,4,4)
     for x in range(8,640,32):
@@ -230,6 +231,11 @@ def make_scene(source:dict[str,Any])->Image.Image:
     for x in range(0,640,48):
         line_scene(im,x,202,x+24,190,3); line_scene(im,x+24,190,x+48,202,3)
         put_scene(im,x+24,190,5)
+    # Boiler and archive machinery in the deepest parallax plane.
+    rect_scene(im,290,82,92,94,1); rect_scene(im,298,90,76,78,17)
+    rect_scene(im,306,98,60,6,3); rect_scene(im,312,112,48,36,2); rect_scene(im,320,120,32,20,1)
+    for x,y in [(304,96),(366,96),(308,164),(362,164),(322,108),(350,108)]: put_scene(im,x,y,6)
+    rect_scene(im,334,125,5,12,8); put_scene(im,336,123,12); line_scene(im,336,137,350,150,8)
     for x in (40,180,440,560):
         rect_scene(im,x,70,8,175,6); rect_scene(im,x-8,76,24,6,8)
     for x in range(20,620,96):
@@ -245,6 +251,11 @@ def make_scene(source:dict[str,Any])->Image.Image:
         rect_scene(im,x,y,4,13,6); rect_scene(im,x-4,y+13,12,8,12); rect_scene(im,x-1,y+15,6,4,7)
         # Hard-edged lamp spill; ordered dots preserve pixel language.
         for dx,dy in [(-10,22),(10,22),(-18,29),(18,29),(-28,37),(28,37)]: put_scene(im,x+dx,y+dy,11)
+    # Foreground cable bundle and a toothed drilled wall; nearer values remain dark.
+    for offset,c in [(0,1),(4,3),(8,4)]:
+        line_scene(im,0,216+offset,112,216+offset,c); line_scene(im,112,216+offset,150,236+offset,c)
+    for y in range(176,240,12):
+        line_scene(im,326,y,348,y+6,6); put_scene(im,346,y+6,1)
     # tile strip, ores, hazards and mite use actual source pixels scaled 4.
     assets={a['id']:a for a in source['assets']}
     tileasset=assets['industrial_tiles'];
@@ -255,14 +266,23 @@ def make_scene(source:dict[str,Any])->Image.Image:
     im.alpha_composite(to_image(assets['scrap_mite']['frames'][5]['pixels']).resize((48,48),Image.Resampling.NEAREST),(450,205))
     # drilling rig
     im.alpha_composite(to_image(assets['drill_default']['frames'][10]['pixels']).resize((128,128),Image.Resampling.NEAREST),(190,155))
+    # Drilling contact: hard sparks, carbide dust and a stepped steam plume.
+    for x,y,c in [(314,213,12),(322,208,7),(329,216,11),(318,224,8),(337,220,12),(346,226,5),(352,216,16),(360,210,16),(368,215,7)]: put_scene(im,x,y,c)
+    for x,y,c in [(272,148,16),(278,142,5),(284,148,16),(288,153,5),(280,158,4)]: put_scene(im,x,y,c)
     # HUD bands: icon sockets, segmented bars and non-text directional pips.
     rect_scene(im,14,14,215,48,1); rect_scene(im,18,18,207,40,3)
     for i,c in enumerate([24,19,9,11]):
         rect_scene(im,26+i*47,29,38,12,1); rect_scene(im,29+i*47,32,32,6,c); put_scene(im,31+i*47,33,7)
+        rect_scene(im,28+i*47,21,12,5,17); put_scene(im,31+i*47,22,c)
     for x in range(22,220,16): put_scene(im,x,51,5)
     rect_scene(im,478,14,148,48,1); rect_scene(im,482,18,140,40,3); rect_scene(im,490,28,120,14,1); rect_scene(im,493,31,114,8,12)
     for x in range(495,607,12): put_scene(im,x,34,7)
     rect_scene(im,486,47,32,5,18); rect_scene(im,524,47,32,5,19); rect_scene(im,562,47,32,5,24)
+    # Corner brackets and a compact tool belt make the HUD read as an assembled device.
+    for x,y in [(18,18),(220,18),(18,54),(220,54),(482,18),(620,18),(482,54),(620,54)]:
+        rect_scene(im,x,y,4,2,6); rect_scene(im,x,y,2,4,6)
+    for i,c in enumerate([19,12,24,11,15]):
+        rect_scene(im,610-i*16,66,12,12,1); rect_scene(im,613-i*16,69,6,6,c)
     return im
 
 def rect_scene(im:Image.Image,x:int,y:int,w:int,h:int,c:int)->None:
