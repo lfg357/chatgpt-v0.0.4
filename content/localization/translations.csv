@@ -1,0 +1,7 @@
+keys,en,zh_CN
+menu.title,Time Strata Drill Bureau,时层钻探局
+profile.title,Select Profile,选择档案
+hub.title,Hub: Archive Station,基地：档案站
+dive.title,Dive: Technical Validation,下潜：技术验证
+results.title,Results: Greybox Record,结算：灰盒记录
+error.illegal_transition,The requested flow transition is not allowed.,当前流程不能切换到目标页面。

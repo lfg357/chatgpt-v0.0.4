@@ -1,0 +1,41 @@
+; Engine configuration file.
+; M0 bootstrap for Time Strata Drill Bureau.
+config_version=5
+
+[application]
+config/name="Time Strata Drill Bureau"
+run/main_scene="res://scenes/boot/boot.tscn"
+
+[autoload]
+AppState="*res://src/core/app_state.gd"
+ContentDB="*res://src/core/content_db.gd"
+SaveService="*res://src/core/save_service.gd"
+AudioService="*res://src/core/audio_service.gd"
+InputService="*res://src/core/input_service.gd"
+SceneRouter="*res://src/core/scene_router.gd"
+
+[display]
+
+[display/window]
+size/viewport_width=640
+size/viewport_height=360
+size/window_width_override=1280
+size/window_height_override=720
+stretch/mode="canvas_items"
+stretch/scale_mode="integer"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/default_filters/use_nearest_mipmap_filter=false
+textures/canvas_textures/default_texture_filter=0
+environment/defaults/default_clear_color=Color(0.063, 0.078, 0.122, 1)
+
+[physics]
+common/physics_ticks_per_second=60
+
+[input]
+move_left={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":65)]}
+move_right={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":68)]}
+drill={"deadzone":0.5,"events":[Object(InputEventMouseButton,"button_index":1)]}
+pause={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":4194305)]}

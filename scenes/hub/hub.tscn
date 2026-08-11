@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource path="res://scenes/ui/screen.gd" type="Script" id="1"]
+[node name="Hub" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")
+title_key = "hub.title"
+next_mode = 4
+[node name="Panel" type="VBoxContainer" parent="."]
+offset_left = 150.0
+offset_top = 80.0
+offset_right = 490.0
+offset_bottom = 280.0
+[node name="Title" type="Label" parent="Panel"]
+horizontal_alignment = 1
+[node name="Continue" type="Button" parent="Panel"]
+text = "Begin technical dive"
