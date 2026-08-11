@@ -18,8 +18,7 @@ func load_all() -> Result:
 	return Result.success(definitions.size())
 
 func _load_localization() -> void:
-	for translation in translations: TranslationServer.remove_translation(translation)
-	translations.clear()
+	clear_localization()
 	var file := FileAccess.open("res://content/localization/translations.csv", FileAccess.READ)
 	if file == null: return
 	var lines := file.get_as_text().strip_edges().split("\n")
@@ -34,6 +33,13 @@ func _load_localization() -> void:
 			if fields.size() == header.size() and not fields[0].is_empty(): translation.add_message(fields[0], fields[column])
 		TranslationServer.add_translation(translation)
 		translations.append(translation)
+
+func clear_localization() -> void:
+	for translation in translations: TranslationServer.remove_translation(translation)
+	translations.clear()
+
+func _exit_tree() -> void:
+	clear_localization()
 
 func get_def(id: StringName, expected_type: StringName = &"") -> ContentDef:
 	var definition: ContentDef = definitions.get(id)

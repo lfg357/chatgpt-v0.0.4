@@ -10,4 +10,7 @@ Expect-Exit -GodotArgs @('--selftest-zero') -Expected 1
 Expect-Exit -GodotArgs @('--test-root=res://tests/fixtures/hooks') -Expected 0
 Expect-Exit -GodotArgs @('--test-root=res://tests/fixtures/failure') -Expected 1
 Expect-Exit -GodotArgs @('--test-root=res://tests/fixtures/timeout') -Expected 1
+Expect-Exit -GodotArgs @('--test-root=res://tests/fixtures/load_failure') -Expected 1
+Expect-Exit -GodotArgs @('--test-root=res://tests/fixtures/exception') -Expected 1
+Expect-Exit -GodotArgs @('--test-root=res://tests/fixtures/exception_hook') -Expected 1
 Write-Host 'Runner self-test passed.'

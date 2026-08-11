@@ -1,5 +1,6 @@
 param(
-    [string]$GodotBin = $env:GODOT_BIN
+    [string]$GodotBin = $env:GODOT_BIN,
+    [switch]$Quick
 )
 $ErrorActionPreference = 'Stop'
 if ([string]::IsNullOrWhiteSpace($GodotBin)) { $GodotBin = 'C:\Users\AdminLFG\AppData\Local\Programs\Godot\Godot_v4.7-stable_win64_console.exe' }
@@ -21,6 +22,11 @@ Write-Host '3/5 test suite'
 Invoke-GodotChecked @('--script', 'res://tests/test_runner.gd')
 Write-Host '4/5 localization keys'
 Invoke-GodotChecked @('--script', 'res://tools/check_localization.gd')
-Write-Host '5/5 M1 performance smoke'
-Invoke-GodotChecked @('--script', 'res://tools/benchmark_m1.gd', '--', '--quick')
+Write-Host '5/6 M1 performance gate self-test'
+& powershell -ExecutionPolicy Bypass -File tools\benchmark_selftest.ps1 -GodotBin $GodotBin
+if ($LASTEXITCODE -ne 0) { throw 'Benchmark gate self-test failed.' }
+Write-Host '6/6 M1 performance gate'
+$benchmarkArgs = @('--script', 'res://tools/benchmark_m1.gd')
+if ($Quick) { $benchmarkArgs += @('--', '--quick') }
+Invoke-GodotChecked -GodotArgs $benchmarkArgs
 Write-Host 'Verification passed.'
