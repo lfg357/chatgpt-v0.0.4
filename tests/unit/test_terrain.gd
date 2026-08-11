@@ -30,6 +30,7 @@ func test_chunk_rebuild_budget() -> bool:
 func test_object_pool_recycles() -> bool:
 	var pool := ObjectPool.new(); pool.warm(2)
 	var item := pool.acquire(); pool.release(item)
+	pool.release(item)
 	assert_equal(pool.available.size(), 2); assert_equal(pool.active.size(), 0)
 	return true
 

@@ -17,6 +17,7 @@ func acquire() -> Dictionary:
 	return item
 
 func release(item: Dictionary) -> void:
-	if active.has(item):
-		active.erase(item)
-		item["active"] = false; available.append(item)
+	if not active.has(item): return
+	active.erase(item)
+	item["active"] = false
+	available.append(item)
