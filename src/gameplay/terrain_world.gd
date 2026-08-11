@@ -1,12 +1,14 @@
 class_name TerrainWorld extends Node2D
 
+const TerrainServiceValue = preload("res://src/gameplay/terrain_service.gd")
+
 ## Presentation and collision adapter for TerrainService.
 ## TerrainService remains the only terrain truth; dirty chunks disable old collision
 ## immediately, then rebuild under the service's per-tick budget.
 @export var cell_size: int = 8
 @export var grid_size := Vector2i(64, 32)
 @export var initially_solid := true
-var terrain := TerrainService.new()
+var terrain := TerrainServiceValue.new()
 var chunk_bodies: Dictionary[Vector2i, StaticBody2D] = {}
 
 func _ready() -> void:
@@ -46,8 +48,8 @@ func _rebuild_chunk_collision(chunk: Vector2i) -> void:
 	body.collision_layer = 1
 	add_child(body)
 	chunk_bodies[chunk] = body
-	var start := chunk * TerrainService.CHUNK_SIZE
-	var end := Vector2i(mini(start.x + TerrainService.CHUNK_SIZE, grid_size.x), mini(start.y + TerrainService.CHUNK_SIZE, grid_size.y))
+	var start := chunk * TerrainServiceValue.CHUNK_SIZE
+	var end := Vector2i(mini(start.x + TerrainServiceValue.CHUNK_SIZE, grid_size.x), mini(start.y + TerrainServiceValue.CHUNK_SIZE, grid_size.y))
 	for y in range(start.y, end.y):
 		for x in range(start.x, end.x):
 			var cell := Vector2i(x, y)

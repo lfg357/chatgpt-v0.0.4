@@ -13,23 +13,27 @@ function Invoke-GodotChecked([string[]]$GodotArgs, [bool]$ExpectSuccess = $true)
     if ((-not $ExpectSuccess) -and $actual -eq 0) { throw "Godot command unexpectedly succeeded: $($GodotArgs -join ' ')" }
 }
 
-Write-Host '1/7 headless project launch and script parse'
+Write-Host '1/8 core autoload parse gate'
+Invoke-GodotChecked @('--script', 'res://tools/check_autoload_parse.gd')
+& powershell -ExecutionPolicy Bypass -File tools\autoload_parse_selftest.ps1 -GodotBin $GodotBin
+if ($LASTEXITCODE -ne 0) { throw 'Autoload parse self-test failed.' }
+Write-Host '2/8 headless project launch and scene smoke'
 Invoke-GodotChecked @('--', '--scene-smoke')
-Write-Host '2/7 runner deliberate-failure self-test'
+Write-Host '3/8 runner deliberate-failure self-test'
 & powershell -ExecutionPolicy Bypass -File tools\test_runner_selftest.ps1 -GodotBin $GodotBin
 if ($LASTEXITCODE -ne 0) { throw 'Test runner self-test failed.' }
-Write-Host '3/7 test suite'
+Write-Host '4/8 test suite'
 Invoke-GodotChecked @('--script', 'res://tests/test_runner.gd')
-Write-Host '4/7 localization keys'
+Write-Host '5/8 localization keys'
 Invoke-GodotChecked @('--script', 'res://tools/check_localization.gd')
-Write-Host '5/7 M1 performance gate self-test'
+Write-Host '6/8 M1 performance gate self-test'
 & powershell -ExecutionPolicy Bypass -File tools\benchmark_selftest.ps1 -GodotBin $GodotBin
 if ($LASTEXITCODE -ne 0) { throw 'Benchmark gate self-test failed.' }
-Write-Host '6/7 M1 performance gate'
+Write-Host '7/8 M1 performance gate'
 $benchmarkArgs = @('--script', 'res://tools/benchmark_m1.gd')
 if ($Quick) { $benchmarkArgs += @('--', '--quick') }
 Invoke-GodotChecked -GodotArgs $benchmarkArgs
-Write-Host '7/7 M1 endurance memory gate'
+Write-Host '8/8 M1 endurance memory gate'
 & powershell -ExecutionPolicy Bypass -File tools\endurance_selftest.ps1 -GodotBin $GodotBin
 if ($LASTEXITCODE -ne 0) { throw 'Endurance gate self-test failed.' }
 $enduranceArgs = @('--script', 'res://tools/terrain_endurance.gd')

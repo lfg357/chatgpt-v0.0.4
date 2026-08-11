@@ -1,21 +1,24 @@
 extends Node
 
-var definitions: Dictionary[StringName, ContentDef] = {}
+const ContentDefValue = preload("res://src/core/content_def.gd")
+const ResultValue = preload("res://src/core/result.gd")
+
+var definitions: Dictionary[StringName, ContentDefValue] = {}
 var translations: Array[Translation] = []
 
-func load_all() -> Result:
+func load_all() -> ResultValue:
 	definitions.clear()
 	_load_localization()
 	var dir := DirAccess.open("res://content/definitions")
-	if dir == null: return Result.success()
+	if dir == null: return ResultValue.success()
 	dir.list_dir_begin()
 	var name := dir.get_next()
 	while name != "":
 		if name.ends_with(".tres"):
-			var definition := load("res://content/definitions/" + name) as ContentDef
+			var definition := load("res://content/definitions/" + name) as ContentDefValue
 			if definition != null and definition.id != &"": definitions[definition.id] = definition
 		name = dir.get_next()
-	return Result.success(definitions.size())
+	return ResultValue.success(definitions.size())
 
 func _load_localization() -> void:
 	clear_localization()
@@ -41,8 +44,8 @@ func clear_localization() -> void:
 func _exit_tree() -> void:
 	clear_localization()
 
-func get_def(id: StringName, expected_type: StringName = &"") -> ContentDef:
-	var definition: ContentDef = definitions.get(id)
+func get_def(id: StringName, expected_type: StringName = &"") -> ContentDefValue:
+	var definition: ContentDefValue = definitions.get(id)
 	if definition == null: return null
 	if expected_type != &"" and definition.get_class() != expected_type: return null
 	return definition

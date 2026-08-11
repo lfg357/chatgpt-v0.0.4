@@ -1,5 +1,7 @@
 extends Node
 
+const ResultValue = preload("res://src/core/result.gd")
+
 signal mode_changed(previous: AppMode, current: AppMode, payload: Dictionary)
 enum AppMode { BOOT, MAIN_MENU, PROFILE_SELECT, HUB, DIVE, RESULTS, SOFT_RESET }
 var mode: AppMode = AppMode.BOOT
@@ -15,9 +17,9 @@ const ALLOWED := {
 	AppMode.SOFT_RESET: [AppMode.HUB]
 }
 
-func request_transition(target: AppMode, payload: Dictionary = {}) -> Result:
-	if not ALLOWED.get(mode, []).has(target): return Result.failure(&"illegal_transition", &"error.illegal_transition")
+func request_transition(target: AppMode, payload: Dictionary = {}) -> ResultValue:
+	if not ALLOWED.get(mode, []).has(target): return ResultValue.failure(&"illegal_transition", &"error.illegal_transition")
 	var previous := mode
 	mode = target
 	mode_changed.emit(previous, mode, payload)
-	return Result.success()
+	return ResultValue.success()
