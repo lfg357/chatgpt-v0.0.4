@@ -12,8 +12,8 @@ function Invoke-GodotChecked([string[]]$Args, [bool]$ExpectSuccess = $true) {
     if ((-not $ExpectSuccess) -and $actual -eq 0) { throw "Godot command unexpectedly succeeded: $($Args -join ' ')" }
 }
 
-Write-Host '1/5 headless import and script parse'
-Invoke-GodotChecked @('--editor', '--quit-after', '1')
+Write-Host '1/5 headless project launch and script parse'
+Invoke-GodotChecked @('--', '--scene-smoke')
 Write-Host '2/5 runner deliberate-failure self-test'
 Invoke-GodotChecked @('--script', 'res://tests/test_runner.gd', '--', '--selftest-failure') $false
 Write-Host '3/5 test suite'
