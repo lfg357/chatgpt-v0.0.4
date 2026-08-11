@@ -30,6 +30,12 @@ func request_explosion(center: Vector2i, radius: int) -> int:
 			if cell.distance_squared_to(center) <= radius * radius and request_damage(cell): queued += 1
 	return queued
 
+func restore_solid(cell: Vector2i) -> bool:
+	if not _in_bounds(cell) or is_solid(cell): return false
+	cells[_index(cell)] = 1
+	dirty_chunks[_chunk_for(cell)] = true
+	return true
+
 func commit_damage() -> int:
 	var changed := 0
 	for cell in pending_damage:

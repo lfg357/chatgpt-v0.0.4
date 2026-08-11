@@ -1,6 +1,7 @@
 extends TestCase
 const TerrainService = preload("res://src/gameplay/terrain_service.gd")
 const ObjectPool = preload("res://src/gameplay/object_pool.gd")
+const EffectPools = preload("res://src/gameplay/effect_pools.gd")
 
 func test_tile_damage_is_deduplicated_per_frame() -> bool:
 	var terrain := TerrainService.new(); terrain.setup(64, 64)
@@ -30,4 +31,16 @@ func test_object_pool_recycles() -> bool:
 	var pool := ObjectPool.new(); pool.warm(2)
 	var item := pool.acquire(); pool.release(item)
 	assert_equal(pool.available.size(), 2); assert_equal(pool.active.size(), 0)
+	return true
+
+func test_all_effect_pools_recycle() -> bool:
+	var pools := EffectPools.new()
+	pools.warm_all(2)
+	for kind in [&"debris", &"dust", &"sparks", &"damage_numbers"]:
+		var item := pools.acquire(kind)
+		pools.release(kind, item)
+	assert_equal(pools.debris.active.size(), 0)
+	assert_equal(pools.dust.active.size(), 0)
+	assert_equal(pools.sparks.active.size(), 0)
+	assert_equal(pools.damage_numbers.active.size(), 0)
 	return true
