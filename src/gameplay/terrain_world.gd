@@ -8,13 +8,26 @@ const TerrainServiceValue = preload("res://src/gameplay/terrain_service.gd")
 @export var cell_size: int = 8
 @export var grid_size := Vector2i(64, 32)
 @export var initially_solid := true
+@export var m2_graybox := false
 var terrain := TerrainServiceValue.new()
 var chunk_bodies: Dictionary[Vector2i, StaticBody2D] = {}
 
 func _ready() -> void:
 	terrain.setup(grid_size.x, grid_size.y)
 	if not initially_solid: terrain.cells.fill(0)
+	if m2_graybox: _carve_m2_graybox()
+	else:
+		for y in range(0, grid_size.y, TerrainServiceValue.CHUNK_SIZE):
+			for x in range(0, grid_size.x, TerrainServiceValue.CHUNK_SIZE):
+				terrain.dirty_chunks[Vector2i(x / TerrainServiceValue.CHUNK_SIZE, y / TerrainServiceValue.CHUNK_SIZE)] = true
 	queue_redraw()
+
+func _carve_m2_graybox() -> void:
+	# Fixed M2 playground: safe spawn, drill wall, tool chamber, sonar lane and extraction bay.
+	for y in range(2, grid_size.y - 2):
+		for x in range(2, grid_size.x - 2):
+			if y < 8 or (x < 14 and y < 16) or (x > 28 and y > 14) or (x > 42 and y < 14):
+				terrain.set_initial_empty(Vector2i(x, y))
 
 func request_damage(cell: Vector2i, amount: int = 1) -> bool:
 	return terrain.request_damage(cell, amount)

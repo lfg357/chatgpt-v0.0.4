@@ -8,7 +8,7 @@ const BEACON_LIMIT := 3
 const RECALL_SECONDS := 1.5
 
 var blast_pins: Array[Vector2i] = []
-var ammo := 3
+var ammo := 2
 var sonar_seconds := 0.0
 var sonar_cooldown := 0.0
 var beacons: Array[Vector2] = []
@@ -27,12 +27,19 @@ func place_pin(cell: Vector2i) -> bool:
 
 func detonate(terrain: Variant) -> int:
 	var changed := 0
+	var candidates: Array[Dictionary] = []
 	for pin in blast_pins:
 		for y in range(pin.y - BLAST_RADIUS_CELLS, pin.y + BLAST_RADIUS_CELLS + 1):
 			for x in range(pin.x - BLAST_RADIUS_CELLS, pin.x + BLAST_RADIUS_CELLS + 1):
-				if changed >= BLAST_CELL_CAP: blast_pins.clear(); return changed
 				var cell := Vector2i(x, y)
-				if cell.distance_squared_to(pin) <= BLAST_RADIUS_CELLS * BLAST_RADIUS_CELLS and terrain.request_damage(cell): changed += 1
+				var distance := cell.distance_squared_to(pin)
+				if distance <= BLAST_RADIUS_CELLS * BLAST_RADIUS_CELLS: candidates.append({"cell": cell, "distance": distance})
+	candidates.sort_custom(func(a: Dictionary, b: Dictionary): return a.distance < b.distance)
+	var requested: Dictionary = {}
+	for candidate in candidates:
+		if changed >= BLAST_CELL_CAP: break
+		var cell: Vector2i = candidate.cell
+		if not requested.has(cell) and terrain.request_damage(cell): requested[cell] = true; changed += 1
 	blast_pins.clear()
 	return changed
 
@@ -43,4 +50,3 @@ func activate_sonar() -> bool:
 func place_beacon(position: Vector2) -> void:
 	if beacons.size() >= BEACON_LIMIT: beacons.pop_front()
 	beacons.append(position)
-

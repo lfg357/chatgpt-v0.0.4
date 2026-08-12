@@ -19,6 +19,7 @@ func _physics_process(delta: float) -> void:
 	var result := state.tick(delta, frame, paused)
 	if paused: velocity = Vector2.ZERO; return
 	var desired: Vector2 = frame.move.normalized() * RunState.MAX_SPEED * float(result.move_scale)
+	if state.energy <= 0.0 and not bool(result.boosting): desired = Vector2.ZERO
 	velocity = velocity.move_toward(desired, RunState.THRUST_ACCEL * delta)
 	velocity.y = minf(velocity.y + RunState.GRAVITY * delta, RunState.MAX_FALL_SPEED)
 	move_and_slide()
@@ -26,7 +27,8 @@ func _physics_process(delta: float) -> void:
 	if frame.has_pressed(2):
 		var cell := _cell_at(global_position + state.last_aim * 18.0)
 		if tools.blast_pins.is_empty(): tools.place_pin(cell)
-		else: tools.detonate(terrain)
+		else:
+			if tools.detonate(terrain) > 0 and has_node("M2Camera"): $M2Camera.add_trauma(0.35)
 	if frame.has_pressed(8): tools.activate_sonar()
 	if frame.has_pressed(16): tools.place_beacon(global_position)
 	tools.tick(delta, frame.has_held(32), paused)

@@ -39,6 +39,7 @@ position = Vector2(64, 86)
 script = ExtResource("2_terrain")
 cell_size = 8
 grid_size = Vector2i(64, 26)
+m2_graybox = true
 
 [node name="DrillRig" type="CharacterBody2D" parent="."]
 position = Vector2(112, 130)

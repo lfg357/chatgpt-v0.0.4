@@ -16,6 +16,12 @@ func setup(grid_width: int, grid_height: int) -> void:
 	width = grid_width; height = grid_height
 	cells.resize(width * height); cells.fill(1)
 
+func set_initial_empty(cell: Vector2i) -> bool:
+	if not _in_bounds(cell) or not is_solid(cell): return false
+	cells[_index(cell)] = 0
+	dirty_chunks[_chunk_for(cell)] = true
+	return true
+
 func request_damage(cell: Vector2i, _amount: int = 1) -> bool:
 	if not _in_bounds(cell) or not is_solid(cell): return false
 	pending_damage[cell] = true
