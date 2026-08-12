@@ -47,6 +47,21 @@ func test_collision_trauma_only_fires_on_fast_contact_entry() -> bool:
 	dive.free()
 	return true
 
+func test_drill_breaks_the_first_solid_cell_at_the_visible_tip() -> bool:
+	var dive := DiveScene.instantiate()
+	runner_tree.root.add_child(dive)
+	var rig = dive.drill_rig
+	var terrain = dive.terrain_world
+	# Seam begins at x=31; this puts the 6px rig against its left face.
+	rig.global_position = Vector2(31 * terrain.cell_size - 6, 20 * terrain.cell_size + 4)
+	var target := Vector2i(31, 20)
+	assert_true(terrain.terrain.is_solid(target))
+	assert_true(rig._request_drill(Vector2.RIGHT) > 0, "drilling at a touching wall must queue damage")
+	terrain.terrain.commit_damage()
+	assert_true(not terrain.terrain.is_solid(target), "the first contacted wall cell must be removed")
+	dive.queue_free()
+	return true
+
 func test_extraction_routes_to_results_state() -> bool:
 	var dive := DiveScene.instantiate()
 	runner_tree.root.add_child(dive)

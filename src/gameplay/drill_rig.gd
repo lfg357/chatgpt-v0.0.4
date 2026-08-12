@@ -11,6 +11,11 @@ var terrain: Node
 var paused := false
 var _was_colliding := false
 
+const DRILL_CONTACT_REACH := 7.0
+const DRILL_MAX_REACH := 26.0
+const DRILL_SAMPLE_STEP := 4.0
+const DRILL_CELLS_PER_TICK := 4
+
 func _ready() -> void:
 	terrain = get_node_or_null(terrain_path)
 	Input.joy_connection_changed.connect(_on_joy_connection_changed)
@@ -65,18 +70,30 @@ func _update_sprite(drilling: bool) -> void:
 	sprite.rotation = 0.0
 	sprite.flip_h = state.last_aim.x < -0.1
 
-func _request_drill(aim: Vector2) -> void:
-	if terrain == null: return
-	var origin := global_position + aim * 18.0
-	var center := Vector2i(floori(origin.x / terrain.cell_size), floori(origin.y / terrain.cell_size))
+func _request_drill(aim: Vector2) -> int:
+	if terrain == null or aim.length_squared() < 0.001: return 0
+	# Test the visible drill tip first, then march outward. This makes a wall
+	# directly touching the rig reliably break instead of sampling past thin seams.
+	var direction := aim.normalized()
 	var queued := 0
-	for y in range(center.y - 1, center.y + 2):
-		for x in range(center.x - 1, center.x + 2):
-			if queued >= 4: break
-			var delta := Vector2(x - center.x, y - center.y)
-			if delta == Vector2.ZERO or aim.dot(delta.normalized()) >= cos(deg_to_rad(30.0)):
-				if terrain.request_damage(Vector2i(x, y)): queued += 1
-	if queued > 0: _add_camera_trauma(0.05)
+	var requested: Dictionary[Vector2i, bool] = {}
+	var distance := DRILL_CONTACT_REACH
+	while distance <= DRILL_MAX_REACH:
+		var center := _cell_at(global_position + direction * distance)
+		for cell in _drill_cells(center, direction):
+			if queued >= DRILL_CELLS_PER_TICK: break
+			if not requested.has(cell) and terrain.request_damage(cell):
+				requested[cell] = true
+				queued += 1
+		if queued > 0: break
+		distance += DRILL_SAMPLE_STEP
+	if queued > 0: _add_camera_trauma(0.025)
+	return queued
+
+func _drill_cells(center: Vector2i, direction: Vector2) -> Array[Vector2i]:
+	var side := Vector2i(-signi(direction.y), signi(direction.x))
+	if side == Vector2i.ZERO: side = Vector2i.UP
+	return [center, center + side, center - side, center + Vector2i(signi(direction.x), signi(direction.y))]
 
 func _add_camera_trauma(amount: float) -> void:
 	if has_node("M2Camera"): $M2Camera.add_trauma(amount)
