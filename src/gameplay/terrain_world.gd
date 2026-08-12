@@ -1,7 +1,6 @@
 class_name TerrainWorld extends Node2D
 
 const TerrainServiceValue = preload("res://src/gameplay/terrain_service.gd")
-const INDUSTRIAL_TILES = preload("res://assets/sprites/industrial_tiles.png")
 
 ## Presentation and collision adapter for TerrainService.
 ## TerrainService remains the only terrain truth; dirty chunks disable old collision
@@ -94,8 +93,9 @@ func _draw() -> void:
 		for x in range(grid_size.x):
 			if terrain.is_solid(Vector2i(x, y)):
 				var pattern := posmod(x * 7 + y * 11, 29)
-				var variant := 3
-				if pattern == 0: variant = 0
-				elif pattern == 7: variant = 1
-				var source := Rect2(variant * 16, 0, 16, 16)
-				draw_texture_rect_region(INDUSTRIAL_TILES, Rect2(x * cell_size, y * cell_size, cell_size, cell_size), source)
+				var tile_rect := Rect2(x * cell_size, y * cell_size, cell_size, cell_size)
+				var base := Color("26374c")
+				if pattern == 0: base = Color("46576b")
+				elif pattern == 7: base = Color("344a60")
+				draw_rect(tile_rect, base)
+				draw_line(tile_rect.position + Vector2(1, 1), tile_rect.end - Vector2(2, 2), Color("607287", 0.55), 1.0)

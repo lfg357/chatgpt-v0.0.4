@@ -16,13 +16,21 @@ try {
     Expand-Archive -LiteralPath $archive -DestinationPath $snapshot -Force
     $previousPreference = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
-    try { $output = @(& $GodotBin --headless --editor --path $snapshot --quit-after 120 2>&1) }
+    try { $importOutput = @(& $GodotBin --headless --editor --path $snapshot --quit-after 120 2>&1) }
     finally { $ErrorActionPreference = $previousPreference }
-    $output | ForEach-Object { Write-Host $_ }
+    $importOutput | ForEach-Object { Write-Host $_ }
     if ($LASTEXITCODE -ne 0) { throw "Cold snapshot import failed with exit code $LASTEXITCODE." }
-    $engineErrors = @($output | Where-Object { "$_" -match '(^|\s)(SCRIPT ERROR:|Parse Error:|ERROR:)' })
-    if ($engineErrors.Count -gt 0) { throw "Cold snapshot import printed engine errors: $($engineErrors -join ' | ')" }
-    Write-Host 'Cold snapshot import passed.'
+    $importErrors = @($importOutput | Where-Object { "$_" -match '(^|\s)(SCRIPT ERROR:|Parse Error:|ERROR:)' })
+    if ($importErrors.Count -gt 0) { throw "Cold snapshot import printed engine errors: $($importErrors -join ' | ')" }
+
+    $ErrorActionPreference = 'Continue'
+    try { $testOutput = @(& $GodotBin --headless --path $snapshot --script res://tests/test_runner.gd 2>&1) }
+    finally { $ErrorActionPreference = $previousPreference }
+    $testOutput | ForEach-Object { Write-Host $_ }
+    if ($LASTEXITCODE -ne 0) { throw "Cold snapshot test suite failed with exit code $LASTEXITCODE." }
+    $testErrors = @($testOutput | Where-Object { "$_" -match '(^|\s)(SCRIPT ERROR:|Parse Error:|ERROR:)' })
+    if ($testErrors.Count -gt 0) { throw "Cold snapshot test suite printed engine errors: $($testErrors -join ' | ')" }
+    Write-Host 'Cold snapshot tests and import passed.'
 }
 finally {
     if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Recurse -Force }

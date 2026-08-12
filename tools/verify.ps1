@@ -21,7 +21,7 @@ function Invoke-GodotChecked([string[]]$GodotArgs, [bool]$ExpectSuccess = $true)
     }
 }
 
-Write-Host '1/10 clean-snapshot import and resource parse gate'
+Write-Host '1/10 clean-snapshot import, test and resource parse gate'
 & powershell -ExecutionPolicy Bypass -File tools\cold_import_selftest.ps1 -GodotBin $GodotBin
 if ($LASTEXITCODE -ne 0) { throw 'Cold snapshot import gate failed.' }
 Write-Host '2/10 cache-free test suite (run this first in a clean snapshot)'
