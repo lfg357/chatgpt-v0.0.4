@@ -8,3 +8,14 @@ dive.sandbox.status,Queued: %d | Dirty chunks: %d | Collision rebuilds: %d,待�
 dive.sandbox.back,Return to hub,返回基地
 results.title,Results: Greybox Record,结算：灰盒记录
 error.illegal_transition,The requested flow transition is not allowed.,当前流程不能切换到目标页面。
+m2.hud.hull,HULL %03d,耐久 %03d
+m2.hud.energy,ENERGY %03d,能量 %03d
+m2.hud.heat,HEAT %03d%s,热量 %03d%s
+m2.hud.shutdown, SHUTDOWN, 停机
+m2.hud.objective,M2 GREYBOX\nDEPTH %03d,M2 灰盒\n深度 %03d
+m2.hud.tool,BLAST PIN %d,爆破钉 %d
+m2.hud.utility,SONAR %.1f  BEACON %d,声呐 %.1f  信标 %d
+m2.hud.extract,HOLD F: EXTRACT %.0f%%,长按 F：撤离 %.0f%%
+m2.pause.title,PAUSED,已暂停
+m2.pause.resume,RESUME,继续
+m2.pause.return_hub,RETURN TO HUB,返回基地
