@@ -147,6 +147,8 @@ HUB → SOFT_RESET_CONFIRM → LAW_SELECT → HUB
 
 退出条件：两种输入均可完成 10 分钟连续游玩，无卡死、穿墙或输入锁死。
 
+进入 M3 的硬闸口：除自动验证通过外，`tools/m2_playtest_record.md` 必须包含已签字的 `M2_ACCEPTANCE_STATUS=ACCEPTED` 汇总，且 `tools/m2_acceptance_gate.ps1` 必须在当前提交历史中通过。没有该证据，不得将 M2 标记为完成或开始 M3 实现。
+
 ### M2 手感门
 
 至少 3 名真人完成共 5 次无口头指导试玩：
