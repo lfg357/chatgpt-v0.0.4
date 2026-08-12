@@ -54,7 +54,9 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if completed: return
 	var started_usec := Time.get_ticks_usec()
+	var timeout_pulses_before: int = run.boiler.timeout_pulses
 	run.tick(delta, rig.paused)
+	if run.boiler.timeout_pulses > timeout_pulses_before: rig.state.damage(30)
 	if rig.paused: return
 	steam.cycle_seconds = 4.0 + run.boiler.valves.count(true)
 	steam.tick(delta)
@@ -74,7 +76,9 @@ func _seed_minerals() -> void:
 		var budget := mini(8, int(room.mineral_budget))
 		for index in range(budget):
 			var cell := Vector2i(room.position.x + 3 + index % maxi(1, int(room.size.x) - 6), room.position.y + int(room.size.y) - 3 - index / maxi(1, int(room.size.x) - 6))
-			terrain.restore_solid(cell); mineral_cells[cell] = {"id": mineral_ids[posmod(index + int(room.index), 3)], "damaged": false, "near_cable": room.module_id == &"room_ind_cable_vault"}
+			var mineral_id: StringName = mineral_ids[posmod(index + int(room.index), 3)]
+			terrain.restore_solid(cell); terrain.drill_hardness[cell] = float(ContentDB.get_def(mineral_id, &"MineralDef").hardness)
+			mineral_cells[cell] = {"id": mineral_id, "damaged": false, "near_cable": room.module_id == &"room_ind_cable_vault"}
 
 func mark_blast_damage(center: Vector2i, radius: int = 4) -> void:
 	for cell in mineral_cells:
@@ -162,6 +166,20 @@ func _near_tag(tag: StringName, distance: float) -> bool:
 	for room in generated_map.room_instances:
 		if room.tags.has(tag) and rig.global_position.distance_to(Vector2(room.position + room.size / 2) * terrain.cell_size) <= distance: return true
 	return false
+func current_room_id() -> StringName:
+	for room in generated_map.room_instances:
+		if Rect2(Vector2(room.position * terrain.cell_size), Vector2(room.size * terrain.cell_size)).has_point(rig.global_position): return room.module_id
+	return &"corridor"
+func current_warning() -> StringName:
+	if steam.state == steam.State.WARNING and _near_module(&"room_ind_steam_cross", 96.0): return &"steam"
+	if steam.state == steam.State.FIRING and _near_module(&"room_ind_steam_cross", 96.0): return &"steam_firing"
+	if cable.active and _near_module(&"room_ind_cable_vault", 48.0): return &"cable"
+	if shale.state == shale.State.WAITING or shale.state == shale.State.FALLING: return &"shale"
+	return &""
+func extraction_direction() -> String:
+	var target := Vector2(generated_map.spawn_cell * terrain.cell_size)
+	var delta: Vector2 = target - rig.global_position
+	return "←" if absf(delta.x) >= absf(delta.y) and delta.x < 0.0 else "→" if absf(delta.x) >= absf(delta.y) else "↑" if delta.y < 0.0 else "↓"
 func _room_center(id: StringName) -> Vector2:
 	for room in generated_map.room_instances:
 		if room.module_id == id: return Vector2(room.position + room.size / 2) * terrain.cell_size

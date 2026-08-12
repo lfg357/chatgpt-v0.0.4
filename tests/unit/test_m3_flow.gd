@@ -61,6 +61,13 @@ func test_production_hazards_and_mite_are_connected_to_map_state() -> bool:
 		dive.free(); AppState.current_run_config = null
 	return true
 
+func test_boiler_timeout_damage_reaches_live_rig_and_can_destroy() -> bool:
+	var dive = DiveScene.instantiate(); runner_tree.root.add_child(dive); var controller = dive.get_node("M3DiveController")
+	controller.rig.state.durability = 20.0; controller.run.boiler.active = true; controller.run.boiler.remaining = 0.01
+	controller._physics_process(.02)
+	assert_equal(controller.run.damage_taken, 30); assert_equal(controller.rig.state.durability, 0.0)
+	dive.queue_free(); AppState.current_run_config = null; return true
+
 func test_flow_scene_cycle_has_no_growth() -> bool:
 	timeout_seconds = 5.0
 	var baseline := runner_tree.get_node_count()

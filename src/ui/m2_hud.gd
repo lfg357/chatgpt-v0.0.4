@@ -16,6 +16,8 @@ var abandon_armed := false
 @onready var pause_panel: Panel = $PausePanel
 @onready var resume: Button = $PausePanel/Resume
 @onready var return_to_hub: Button = $PausePanel/ReturnToHub
+@onready var dive_status: Label = $DiveStatus
+@onready var danger: Label = $Danger
 
 func _ready() -> void:
 	rig = get_node_or_null(rig_path)
@@ -40,10 +42,14 @@ func _process(_delta: float) -> void:
 	if controller != null:
 		var run = controller.run
 		objective.text = (tr("m3.hud.objective") % [run.cargo_used, run.CARGO_CAPACITY, run.combo_multiplier(), run.combo_remaining]).replace("\\n", "\n")
+		var valves_done: int = int(run.boiler.valves.count(true))
+		dive_status.text = tr("m3.hud.status") % [String(controller.current_room_id()), run.boiler.remaining if run.boiler.active else 0.0, valves_done]
+		var warning: StringName = controller.current_warning()
+		danger.text = tr("m3.warning.%s" % String(warning)) if warning != &"" else ""
 	else: objective.text = (tr("m2.hud.objective") % int(rig.global_position.y)).replace("\\n", "\n")
 	tool.text = tr("m2.hud.tool") % rig.tools.ammo
 	utility.text = tr("m2.hud.utility") % [rig.tools.sonar_cooldown, rig.tools.beacon_ammo]
-	extraction.text = tr("m2.hud.extract") % minf(100.0, rig.tools.recall_seconds / rig.tools.RECALL_SECONDS * 100.0)
+	extraction.text = (tr("m3.hud.extract") % [controller.extraction_direction(), minf(100.0, rig.tools.recall_seconds / rig.tools.RECALL_SECONDS * 100.0)]) if controller != null else tr("m2.hud.extract") % minf(100.0, rig.tools.recall_seconds / rig.tools.RECALL_SECONDS * 100.0)
 	pause_panel.visible = rig.paused
 
 func _on_abandon_pressed() -> void:

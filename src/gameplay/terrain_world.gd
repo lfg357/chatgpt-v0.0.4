@@ -15,6 +15,8 @@ const DAMAGE_REDRAW_INTERVAL := 1.0 / 30.0
 var terrain := TerrainServiceValue.new()
 var chunk_bodies: Dictionary[Vector2i, StaticBody2D] = {}
 var _damage_redraw_elapsed := 0.0
+var drill_hardness: Dictionary[Vector2i, float] = {}
+var drill_progress: Dictionary[Vector2i, float] = {}
 
 func _ready() -> void:
 	terrain.setup(grid_size.x, grid_size.y)
@@ -42,7 +44,12 @@ func _carve_m2_graybox() -> void:
 					terrain.set_initial_empty(Vector2i(x, y))
 
 func request_damage(cell: Vector2i, amount: int = TerrainServiceValue.TILE_DURABILITY) -> bool:
-	return terrain.request_damage(cell, amount)
+	var hardness: float = float(drill_hardness.get(cell, 1.0))
+	if hardness <= 1.0 or amount >= TerrainServiceValue.TILE_DURABILITY: return terrain.request_damage(cell, amount)
+	var progress: float = float(drill_progress.get(cell, 0.0)) + float(amount) / hardness
+	var applied := floori(progress)
+	drill_progress[cell] = progress - applied
+	return terrain.request_damage(cell, applied) if applied > 0 else terrain.is_solid(cell)
 
 func request_explosion(center: Vector2i, radius: int) -> int:
 	return terrain.request_explosion(center, radius)
@@ -53,6 +60,7 @@ func restore_solid(cell: Vector2i) -> bool:
 func _physics_process(delta: float) -> void:
 	var had_pending_damage := not terrain.pending_damage.is_empty()
 	var changed := terrain.commit_damage()
+	for removed in terrain.last_removed_cells: drill_progress.erase(removed); drill_hardness.erase(removed)
 	if changed > 0: cells_removed.emit(terrain.last_removed_cells.duplicate())
 	if changed > 0:
 		_disable_dirty_chunk_collision()
@@ -72,6 +80,7 @@ func apply_generated_map(map: Variant) -> void:
 	chunk_bodies.clear()
 	grid_size = Vector2i(map.grid_width, map.grid_height)
 	terrain = TerrainServiceValue.new(); terrain.setup(grid_size.x, grid_size.y)
+	drill_hardness.clear(); drill_progress.clear()
 	for y in range(grid_size.y):
 		for x in range(grid_size.x):
 			if map.cell_value(Vector2i(x, y)) == 0: terrain.set_initial_empty(Vector2i(x, y))

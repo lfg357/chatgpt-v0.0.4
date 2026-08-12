@@ -121,6 +121,25 @@ offset_bottom = 30.0
 mouse_filter = 2
 script = ExtResource("8_input_prompt")
 
+[node name="DiveStatus" type="Label" parent="HudLayer/M2Hud"]
+offset_left = 8.0
+offset_top = 34.0
+offset_right = 240.0
+offset_bottom = 54.0
+theme_override_colors/font_color = Color(0.68, 0.86, 0.88, 1)
+theme_override_font_sizes/font_size = 8
+mouse_filter = 2
+
+[node name="Danger" type="Label" parent="HudLayer/M2Hud"]
+offset_left = 400.0
+offset_top = 34.0
+offset_right = 632.0
+offset_bottom = 54.0
+theme_override_colors/font_color = Color(1, 0.58, 0.38, 1)
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 2
+mouse_filter = 2
+
 [node name="BottomFrame" type="Panel" parent="HudLayer/M2Hud"]
 offset_left = 10.0
 offset_top = 302.0
