@@ -1,6 +1,7 @@
 class_name TerrainWorld extends Node2D
 
 const TerrainServiceValue = preload("res://src/gameplay/terrain_service.gd")
+const INDUSTRIAL_TILES = preload("res://assets/sprites/industrial_tiles.png")
 
 ## Presentation and collision adapter for TerrainService.
 ## TerrainService remains the only terrain truth; dirty chunks disable old collision
@@ -23,11 +24,19 @@ func _ready() -> void:
 	queue_redraw()
 
 func _carve_m2_graybox() -> void:
-	# Fixed M2 playground: safe spawn, drill wall, tool chamber, sonar lane and extraction bay.
-	for y in range(2, grid_size.y - 2):
+	# Fixed M2 industrial tunnel: a readable horizontal chamber, drill seam,
+	# lower destructible stratum, tool bay and extraction lane.
+	for y in range(7, grid_size.y - 7):
 		for x in range(2, grid_size.x - 2):
-			if y < 8 or (x < 14 and y < 16) or (x > 28 and y > 14) or (x > 42 and y < 14):
-				terrain.set_initial_empty(Vector2i(x, y))
+			terrain.set_initial_empty(Vector2i(x, y))
+	# Breakable seam separating the safe spawn from the tool chamber.
+	for y in range(16, grid_size.y - 7):
+		for x in range(31, 36):
+			terrain.restore_solid(Vector2i(x, y))
+	# A low ledge gives collision and downward-drilling coverage without obscuring the chamber.
+	for y in range(grid_size.y - 11, grid_size.y - 7):
+		for x in range(52, 62):
+			terrain.restore_solid(Vector2i(x, y))
 
 func request_damage(cell: Vector2i, amount: int = 1) -> bool:
 	return terrain.request_damage(cell, amount)
@@ -75,7 +84,18 @@ func _rebuild_chunk_collision(chunk: Vector2i) -> void:
 				body.add_child(collider)
 
 func _draw() -> void:
+	draw_rect(Rect2(Vector2.ZERO, Vector2(grid_size * cell_size)), Color("0c1421"))
+	# Industrial silhouettes establish ceiling machinery and a readable tunnel scale.
+	for x in range(4, grid_size.x - 4, 12):
+		draw_rect(Rect2(x * cell_size, 7 * cell_size, 2, 17 * cell_size), Color("788894"))
+		draw_rect(Rect2(x * cell_size - 10, 7 * cell_size, 22, 5), Color("c78b4b"))
+		draw_circle(Vector2(x * cell_size + 1, 12 * cell_size), 3.0, Color("f0d36d"))
 	for y in range(grid_size.y):
 		for x in range(grid_size.x):
 			if terrain.is_solid(Vector2i(x, y)):
-				draw_rect(Rect2(x * cell_size, y * cell_size, cell_size - 1, cell_size - 1), Color("53606f"))
+				var pattern := posmod(x * 7 + y * 11, 29)
+				var variant := 3
+				if pattern == 0: variant = 0
+				elif pattern == 7: variant = 1
+				var source := Rect2(variant * 16, 0, 16, 16)
+				draw_texture_rect_region(INDUSTRIAL_TILES, Rect2(x * cell_size, y * cell_size, cell_size, cell_size), source)

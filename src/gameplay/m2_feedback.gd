@@ -15,6 +15,10 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	if rig == null: return
+	var aim: Vector2 = rig.state.last_aim.normalized()
+	var tip: Vector2 = rig.global_position + aim * 22.0
+	draw_line(rig.global_position + aim * 10.0, tip, Color("f2d36b"), 1.0)
+	draw_circle(tip, 2.0, Color("fff2bd"), false, 1.0)
 	for beacon in rig.tools.beacons:
 		draw_colored_polygon(PackedVector2Array([beacon + Vector2(0, -7), beacon + Vector2(5, 0), beacon + Vector2(0, 7), beacon + Vector2(-5, 0)]), Color("73d1c8"))
 	for pin in rig.tools.blast_pins:

@@ -9,7 +9,7 @@ var state := RunState.new()
 var tools := Tools.new()
 var terrain: Node
 var paused := false
-var _collision_trauma_cooldown := 0.0
+var _was_colliding := false
 
 func _ready() -> void:
 	terrain = get_node_or_null(terrain_path)
@@ -23,7 +23,6 @@ func set_paused(value: bool) -> void:
 		InputService.suppress_gameplay_for_frames()
 
 func _physics_process(delta: float) -> void:
-	_collision_trauma_cooldown = maxf(0.0, _collision_trauma_cooldown - delta)
 	var mouse_aim := get_global_mouse_position() - global_position
 	var frame = InputService.frame_from_actions(mouse_aim, Engine.get_physics_frames())
 	if frame.has_pressed(64): set_paused(not paused)
@@ -33,10 +32,11 @@ func _physics_process(delta: float) -> void:
 	if state.energy <= 0.0 and not bool(result.boosting): desired = Vector2.ZERO
 	velocity = velocity.move_toward(desired, RunState.THRUST_ACCEL * delta)
 	velocity.y = minf(velocity.y + RunState.GRAVITY * delta, RunState.MAX_FALL_SPEED)
+	var impact_speed := velocity.length()
 	move_and_slide()
-	if get_slide_collision_count() > 0 and _collision_trauma_cooldown <= 0.0:
+	var is_colliding := get_slide_collision_count() > 0
+	if _consume_collision_impact(is_colliding, impact_speed):
 		_add_camera_trauma(0.2)
-		_collision_trauma_cooldown = 0.15
 	if result.drilling: _request_drill(state.last_aim)
 	if frame.has_pressed(2):
 		var cell := _cell_at(global_position + state.last_aim * 18.0)
@@ -61,7 +61,9 @@ func _update_sprite(drilling: bool) -> void:
 	elif drilling: wanted = &"drill"
 	elif velocity.length() > 5.0: wanted = &"thrust"
 	if sprite.animation != wanted: sprite.play(wanted)
-	sprite.rotation = state.last_aim.angle()
+	# The chassis obeys gravity and stays upright. Aim is shown independently by M2Feedback.
+	sprite.rotation = 0.0
+	sprite.flip_h = state.last_aim.x < -0.1
 
 func _request_drill(aim: Vector2) -> void:
 	if terrain == null: return
@@ -78,6 +80,11 @@ func _request_drill(aim: Vector2) -> void:
 
 func _add_camera_trauma(amount: float) -> void:
 	if has_node("M2Camera"): $M2Camera.add_trauma(amount)
+
+func _consume_collision_impact(is_colliding: bool, impact_speed: float) -> bool:
+	var should_shake := is_colliding and not _was_colliding and impact_speed >= 70.0
+	_was_colliding = is_colliding
+	return should_shake
 
 func _on_run_failed() -> void:
 	velocity = Vector2.ZERO

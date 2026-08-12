@@ -66,25 +66,14 @@ theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
 visible = false
 
-[node name="Instruction" type="Label" parent="."]
-layout_mode = 0
-offset_left = 64.0
-offset_top = 62.0
-offset_right = 576.0
-offset_bottom = 80.0
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.58, 0.78, 0.8, 0.95)
-theme_override_font_sizes/font_size = 10
-
 [node name="TerrainWorld" type="Node2D" parent="."]
-position = Vector2(64, 86)
 script = ExtResource("2_terrain")
 cell_size = 8
-grid_size = Vector2i(64, 26)
+grid_size = Vector2i(80, 38)
 m2_graybox = true
 
 [node name="DrillRig" type="CharacterBody2D" parent="."]
-position = Vector2(112, 130)
+position = Vector2(144, 156)
 script = ExtResource("3_rig")
 terrain_path = NodePath("../TerrainWorld")
 
@@ -96,145 +85,164 @@ sprite_frames = ExtResource("6_drill_frames")
 animation = &"idle"
 autoplay = "idle"
 position = Vector2(0, 0)
-scale = Vector2(0.5, 0.5)
 
 [node name="M2Camera" type="Camera2D" parent="DrillRig"]
 position_smoothing_enabled = true
 script = ExtResource("4_camera")
-map_bounds = Rect2(64, 86, 512, 208)
+map_bounds = Rect2(0, 0, 640, 304)
 
 [node name="M2Feedback" type="Node2D" parent="."]
 script = ExtResource("7_feedback")
 rig_path = NodePath("../DrillRig")
 
-[node name="M2Hud" type="Control" parent="."]
+[node name="HudLayer" type="CanvasLayer" parent="."]
+
+[node name="Instruction" type="Label" parent="HudLayer"]
+offset_left = 64.0
+offset_top = 8.0
+offset_right = 576.0
+offset_bottom = 24.0
+theme_override_colors/font_color = Color(0.58, 0.78, 0.8, 0.95)
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+visible = false
+
+[node name="M2Hud" type="Control" parent="HudLayer"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("5_hud")
-rig_path = NodePath("../DrillRig")
+rig_path = NodePath("../../DrillRig")
 
-[node name="VitalsPanel" type="Panel" parent="M2Hud"]
+[node name="BottomFrame" type="Panel" parent="HudLayer/M2Hud"]
 offset_left = 8.0
-offset_top = 6.0
-offset_right = 178.0
-offset_bottom = 52.0
+offset_top = 300.0
+offset_right = 632.0
+offset_bottom = 354.0
 theme_override_styles/panel = SubResource("StyleBoxHud")
 
-[node name="Hull" type="Label" parent="M2Hud/VitalsPanel"]
-offset_left = 10.0
-offset_top = 5.0
-offset_right = 160.0
-offset_bottom = 23.0
-theme_override_colors/font_color = Color(0.84, 0.93, 0.94, 1)
-theme_override_font_sizes/font_size = 12
-
-[node name="Energy" type="Label" parent="M2Hud/VitalsPanel"]
-offset_left = 10.0
-offset_top = 24.0
-offset_right = 160.0
-offset_bottom = 42.0
-theme_override_colors/font_color = Color(0.38, 0.9, 0.76, 1)
-theme_override_font_sizes/font_size = 12
-
-[node name="HeatPanel" type="Panel" parent="M2Hud"]
-offset_left = 232.0
+[node name="VitalsPanel" type="Panel" parent="HudLayer/M2Hud/BottomFrame"]
+offset_left = 8.0
 offset_top = 6.0
-offset_right = 408.0
-offset_bottom = 52.0
+offset_right = 112.0
+offset_bottom = 48.0
+theme_override_styles/panel = SubResource("StyleBoxHud")
+
+[node name="Hull" type="Label" parent="HudLayer/M2Hud/BottomFrame/VitalsPanel"]
+offset_left = 7.0
+offset_top = 4.0
+offset_right = 99.0
+offset_bottom = 20.0
+theme_override_colors/font_color = Color(0.84, 0.93, 0.94, 1)
+theme_override_font_sizes/font_size = 10
+
+[node name="Energy" type="Label" parent="HudLayer/M2Hud/BottomFrame/VitalsPanel"]
+offset_left = 7.0
+offset_top = 22.0
+offset_right = 99.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.38, 0.9, 0.76, 1)
+theme_override_font_sizes/font_size = 10
+
+[node name="HeatPanel" type="Panel" parent="HudLayer/M2Hud/BottomFrame"]
+offset_left = 116.0
+offset_top = 6.0
+offset_right = 244.0
+offset_bottom = 48.0
 theme_override_styles/panel = SubResource("StyleBoxHeat")
 
-[node name="Heat" type="Label" parent="M2Hud/HeatPanel"]
-offset_left = 8.0
-offset_top = 5.0
-offset_right = 168.0
-offset_bottom = 22.0
+[node name="Heat" type="Label" parent="HudLayer/M2Hud/BottomFrame/HeatPanel"]
+offset_left = 6.0
+offset_top = 4.0
+offset_right = 122.0
+offset_bottom = 19.0
 theme_override_colors/font_color = Color(0.96, 0.83, 0.72, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 9
 horizontal_alignment = 1
 
-[node name="HeatTrack" type="ColorRect" parent="M2Hud/HeatPanel"]
-offset_left = 8.0
-offset_top = 29.0
-offset_right = 168.0
-offset_bottom = 36.0
+[node name="HeatTrack" type="ColorRect" parent="HudLayer/M2Hud/BottomFrame/HeatPanel"]
+offset_left = 6.0
+offset_top = 27.0
+offset_right = 122.0
+offset_bottom = 34.0
 color = Color(0.015, 0.03, 0.045, 1)
 mouse_filter = 2
 
-[node name="HeatFill" type="ColorRect" parent="M2Hud/HeatPanel"]
-offset_left = 8.0
-offset_top = 29.0
-offset_right = 8.0
-offset_bottom = 36.0
+[node name="HeatFill" type="ColorRect" parent="HudLayer/M2Hud/BottomFrame/HeatPanel"]
+offset_left = 6.0
+offset_top = 27.0
+offset_right = 6.0
+offset_bottom = 34.0
 color = Color(0.286, 0.765, 0.694, 1)
 mouse_filter = 2
 
-[node name="ObjectivePanel" type="Panel" parent="M2Hud"]
-offset_left = 480.0
+[node name="ObjectivePanel" type="Panel" parent="HudLayer/M2Hud/BottomFrame"]
+offset_left = 248.0
 offset_top = 6.0
-offset_right = 632.0
-offset_bottom = 52.0
+offset_right = 344.0
+offset_bottom = 48.0
 theme_override_styles/panel = SubResource("StyleBoxHud")
 
-[node name="Objective" type="Label" parent="M2Hud/ObjectivePanel"]
-offset_left = 8.0
-offset_top = 13.0
-offset_right = 144.0
-offset_bottom = 33.0
+[node name="Objective" type="Label" parent="HudLayer/M2Hud/BottomFrame/ObjectivePanel"]
+offset_left = 5.0
+offset_top = 12.0
+offset_right = 91.0
+offset_bottom = 30.0
 theme_override_colors/font_color = Color(0.9, 0.94, 0.97, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 9
 horizontal_alignment = 1
 
-[node name="ToolsPanel" type="Panel" parent="M2Hud"]
-offset_left = 8.0
-offset_top = 310.0
-offset_right = 194.0
-offset_bottom = 354.0
+[node name="ToolsPanel" type="Panel" parent="HudLayer/M2Hud/BottomFrame"]
+offset_left = 348.0
+offset_top = 6.0
+offset_right = 432.0
+offset_bottom = 48.0
 theme_override_styles/panel = SubResource("StyleBoxHud")
 
-[node name="Tool" type="Label" parent="M2Hud/ToolsPanel"]
-offset_left = 10.0
+[node name="Tool" type="Label" parent="HudLayer/M2Hud/BottomFrame/ToolsPanel"]
+offset_left = 4.0
 offset_top = 12.0
-offset_right = 176.0
-offset_bottom = 32.0
+offset_right = 80.0
+offset_bottom = 30.0
 theme_override_colors/font_color = Color(0.94, 0.94, 0.9, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
 
-[node name="UtilityPanel" type="Panel" parent="M2Hud"]
-offset_left = 218.0
-offset_top = 310.0
-offset_right = 428.0
-offset_bottom = 354.0
+[node name="UtilityPanel" type="Panel" parent="HudLayer/M2Hud/BottomFrame"]
+offset_left = 436.0
+offset_top = 6.0
+offset_right = 532.0
+offset_bottom = 48.0
 theme_override_styles/panel = SubResource("StyleBoxHud")
 
-[node name="Utility" type="Label" parent="M2Hud/UtilityPanel"]
-offset_left = 10.0
+[node name="Utility" type="Label" parent="HudLayer/M2Hud/BottomFrame/UtilityPanel"]
+offset_left = 4.0
 offset_top = 12.0
-offset_right = 200.0
-offset_bottom = 32.0
+offset_right = 92.0
+offset_bottom = 30.0
 theme_override_colors/font_color = Color(0.77, 0.88, 0.9, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 8
 horizontal_alignment = 1
 
-[node name="ExtractionPanel" type="Panel" parent="M2Hud"]
-offset_left = 452.0
-offset_top = 310.0
-offset_right = 632.0
-offset_bottom = 354.0
+[node name="ExtractionPanel" type="Panel" parent="HudLayer/M2Hud/BottomFrame"]
+offset_left = 536.0
+offset_top = 6.0
+offset_right = 616.0
+offset_bottom = 48.0
 theme_override_styles/panel = SubResource("StyleBoxHud")
 
-[node name="Extraction" type="Label" parent="M2Hud/ExtractionPanel"]
-offset_left = 8.0
+[node name="Extraction" type="Label" parent="HudLayer/M2Hud/BottomFrame/ExtractionPanel"]
+offset_left = 3.0
 offset_top = 12.0
-offset_right = 172.0
-offset_bottom = 32.0
+offset_right = 77.0
+offset_bottom = 30.0
 theme_override_colors/font_color = Color(0.95, 0.81, 0.52, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 8
 horizontal_alignment = 1
 
-[node name="PausePanel" type="Panel" parent="M2Hud"]
+[node name="PausePanel" type="Panel" parent="HudLayer/M2Hud"]
 offset_left = 206.0
 offset_top = 112.0
 offset_right = 434.0
@@ -242,7 +250,7 @@ offset_bottom = 248.0
 mouse_filter = 0
 theme_override_styles/panel = SubResource("StyleBoxPause")
 
-[node name="PauseLabel" type="Label" parent="M2Hud/PausePanel"]
+[node name="PauseLabel" type="Label" parent="HudLayer/M2Hud/PausePanel"]
 offset_left = 20.0
 offset_top = 16.0
 offset_right = 208.0
@@ -250,14 +258,14 @@ offset_bottom = 42.0
 text = ""
 horizontal_alignment = 1
 
-[node name="Resume" type="Button" parent="M2Hud/PausePanel"]
+[node name="Resume" type="Button" parent="HudLayer/M2Hud/PausePanel"]
 offset_left = 28.0
 offset_top = 52.0
 offset_right = 200.0
 offset_bottom = 82.0
 text = ""
 
-[node name="ReturnToHub" type="Button" parent="M2Hud/PausePanel"]
+[node name="ReturnToHub" type="Button" parent="HudLayer/M2Hud/PausePanel"]
 offset_left = 28.0
 offset_top = 92.0
 offset_right = 200.0
