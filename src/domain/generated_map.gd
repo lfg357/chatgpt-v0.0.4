@@ -2,7 +2,7 @@ class_name GeneratedMap extends RefCounted
 
 var layer_id: StringName
 var seed: int
-var generator_version: int = 1
+var generator_version: int = 2
 var content_version: int = 1
 var grid: PackedInt32Array
 var grid_width: int

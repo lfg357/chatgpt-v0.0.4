@@ -12,5 +12,7 @@ risk_room_ids = Array[StringName]([&"room_bio_spore", &"room_bio_vine_well", &"r
 supply_room_id = &"room_bio_supply"
 relic_room_id = &"room_bio_relic"
 core_room_id = &"room_bio_core"
+min_main_nodes = 9
+max_main_nodes = 10
 min_risk_branches = 2
 max_risk_branches = 2

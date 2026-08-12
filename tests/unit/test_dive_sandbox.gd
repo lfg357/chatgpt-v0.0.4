@@ -65,9 +65,16 @@ func test_drill_breaks_the_first_solid_cell_at_the_visible_tip() -> bool:
 	runner_tree.root.add_child(dive)
 	var rig = dive.drill_rig
 	var terrain = dive.terrain_world
-	# Seam begins at x=31; this puts the 6px rig against its left face.
-	rig.global_position = Vector2(31 * terrain.cell_size - 6, 20 * terrain.cell_size + 4)
-	var target := Vector2i(31, 20)
+	# Locate a generated horizontal rock face instead of binding the M2 drill
+	# contract to one generator topology version.
+	var target := Vector2i(-1, -1)
+	for y in range(1, terrain.grid_size.y - 1):
+		for x in range(2, terrain.grid_size.x - 1):
+			if terrain.terrain.is_solid(Vector2i(x, y)) and not terrain.terrain.is_solid(Vector2i(x - 1, y)):
+				target = Vector2i(x, y); break
+		if target.x >= 0: break
+	assert_true(target.x >= 0, "generated map must expose a drillable horizontal face")
+	rig.global_position = Vector2(target.x * terrain.cell_size - 6, target.y * terrain.cell_size + 4)
 	assert_true(terrain.terrain.is_solid(target))
 	assert_true(rig._request_drill(Vector2.RIGHT) > 0, "drilling at a touching wall must queue damage")
 	for _tick in range(terrain.terrain.TILE_DURABILITY):

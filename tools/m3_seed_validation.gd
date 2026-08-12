@@ -14,7 +14,7 @@ func _run() -> void:
 	var database = ContentDBValue.new(); root.add_child(database)
 	var loaded = database.load_all()
 	if not loaded.ok: _fail("content_load_failed")
-	var report := {"commit_sha": _commit_sha(), "godot_version": Engine.get_version_info().string, "generator_version": 1, "content_version": 1, "seed_range": [0, seed_count - 1], "system": OS.get_distribution_name(), "cpu": OS.get_processor_name(), "build_type": "debug" if OS.is_debug_build() else "release", "layers": {}}
+	var report := {"commit_sha": _commit_sha(), "godot_version": Engine.get_version_info().string, "generator_version": Generator.GENERATOR_VERSION, "content_version": Generator.CONTENT_VERSION, "seed_range": [0, seed_count - 1], "system": OS.get_distribution_name(), "cpu": OS.get_processor_name(), "memory_static_bytes": OS.get_static_memory_usage(), "build_type": "debug" if OS.is_debug_build() else "release", "layers": {}}
 	var failures: Array[Dictionary] = []
 	for layer_id in LAYERS:
 		var layer = database.get_def(layer_id, &"LayerDef")
@@ -41,6 +41,7 @@ func _run() -> void:
 	_write_json("res://reports/m3_seed_validation.json", report)
 	_write_json("res://reports/m3_generation_performance.json", {"commit_sha": report.commit_sha, "godot_version": report.godot_version, "cpu": report.cpu, "system": report.system, "build_type": report.build_type, "layers": report.layers})
 	if not failures.is_empty(): _write_json("res://reports/m3_seed_failures.json", failures)
+	elif FileAccess.file_exists("res://reports/m3_seed_failures.json"): DirAccess.remove_absolute(ProjectSettings.globalize_path("res://reports/m3_seed_failures.json"))
 	print("M3_SEED_VALIDATION layers=3 seeds_per_layer=%d failures=%d" % [seed_count, failures.size()])
 	quit(0 if failures.is_empty() else 1)
 

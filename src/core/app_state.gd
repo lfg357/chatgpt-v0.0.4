@@ -2,6 +2,7 @@ extends Node
 
 const ResultValue = preload("res://src/core/result.gd")
 const EconomyValue = preload("res://src/domain/economy_service.gd")
+const MapGeneratorValue = preload("res://src/domain/map_generator.gd")
 
 signal mode_changed(previous: AppMode, current: AppMode, payload: Dictionary)
 signal run_started(config: Resource)
@@ -33,6 +34,7 @@ func request_transition(target: AppMode, payload: Dictionary = {}) -> ResultValu
 
 func start_run(config: Resource) -> ResultValue:
 	if config == null or config.layer_id == &"" or config.generator_version <= 0: return ResultValue.failure(&"invalid_run_config")
+	if config.generator_version != MapGeneratorValue.GENERATOR_VERSION or config.content_version != MapGeneratorValue.CONTENT_VERSION: return ResultValue.failure(&"unsupported_generation_version")
 	if current_run_config != null: return ResultValue.failure(&"run_already_active")
 	current_run_config = config; last_run_result = null; last_settlement = null
 	run_started.emit(config)

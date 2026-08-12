@@ -11,3 +11,4 @@ class_name LayerDef extends ContentDef
 @export var max_main_nodes: int = 10
 @export var min_risk_branches: int = 0
 @export var max_risk_branches: int = 3
+@export var extra_relic_rooms: int = 0

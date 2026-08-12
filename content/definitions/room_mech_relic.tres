@@ -5,6 +5,6 @@ script=ExtResource("1")
 id=&"room_mech_relic"
 layer_id=&"layer_mech"
 size_cells=Vector2i(26,22)
-connectors=Array[StringName]([&"W",&"E"])
+connectors=Array[StringName]([&"W",&"E",&"N"])
 tags=Array[StringName]([&"relic"])
 risk=3

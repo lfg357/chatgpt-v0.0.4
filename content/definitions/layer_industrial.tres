@@ -12,5 +12,7 @@ risk_room_ids = Array[StringName]([&"room_ind_steam_cross", &"room_ind_cable_vau
 supply_room_id = &"room_ind_supply"
 relic_room_id = &"room_ind_relic"
 core_room_id = &"room_ind_core"
+min_main_nodes = 8
+max_main_nodes = 10
 min_risk_branches = 1
 max_risk_branches = 2
