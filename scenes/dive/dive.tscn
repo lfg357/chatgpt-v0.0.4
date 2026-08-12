@@ -122,9 +122,9 @@ offset_right = 160.0
 offset_bottom = 66.0
 text = "RESUME"
 
-[node name="BackToHub" type="Button" parent="."]
-layout_mode = 0
-offset_left = 250.0
-offset_top = 330.0
-offset_right = 390.0
-offset_bottom = 354.0
+[node name="ReturnToHub" type="Button" parent="M2Hud/PausePanel"]
+offset_left = 36.0
+offset_top = 68.0
+offset_right = 160.0
+offset_bottom = 96.0
+text = "RETURN TO HUB"

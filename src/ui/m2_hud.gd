@@ -11,10 +11,12 @@ var rig: Node
 @onready var extraction: Label = $Extraction
 @onready var pause_panel: Panel = $PausePanel
 @onready var resume: Button = $PausePanel/Resume
+@onready var return_to_hub: Button = $PausePanel/ReturnToHub
 
 func _ready() -> void:
 	rig = get_node_or_null(rig_path)
 	resume.pressed.connect(func(): if rig != null: rig.set_paused(false))
+	return_to_hub.pressed.connect(func(): SceneRouter.go_to(3))
 
 func _process(_delta: float) -> void:
 	if rig == null: return
@@ -27,4 +29,3 @@ func _process(_delta: float) -> void:
 	utility.text = "SONAR %.1f  BEACON %d" % [rig.tools.sonar_cooldown, rig.tools.beacons.size()]
 	extraction.text = "HOLD F: EXTRACT %.0f%%" % minf(100.0, rig.tools.recall_seconds / rig.tools.RECALL_SECONDS * 100.0)
 	pause_panel.visible = rig.paused
-
