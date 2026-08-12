@@ -13,6 +13,7 @@ var dirty_chunks: Dictionary[Vector2i, bool] = {}
 var collision_chunks: Dictionary[Vector2i, Dictionary] = {}
 var rebuilt_this_tick: int = 0
 var total_rebuilds: int = 0
+var last_removed_cells: Array[Vector2i] = []
 
 func setup(grid_width: int, grid_height: int) -> void:
 	width = grid_width; height = grid_height
@@ -46,6 +47,7 @@ func restore_solid(cell: Vector2i) -> bool:
 
 func commit_damage() -> int:
 	var changed := 0
+	last_removed_cells.clear()
 	for cell in pending_damage:
 		if is_solid(cell):
 			var total := int(accumulated_damage.get(cell, 0)) + int(pending_damage[cell])
@@ -53,6 +55,7 @@ func commit_damage() -> int:
 				accumulated_damage[cell] = total
 				continue
 			cells[_index(cell)] = 0
+			last_removed_cells.append(cell)
 			accumulated_damage.erase(cell)
 			dirty_chunks[_chunk_for(cell)] = true
 			changed += 1

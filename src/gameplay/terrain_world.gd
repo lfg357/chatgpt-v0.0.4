@@ -1,5 +1,7 @@
 class_name TerrainWorld extends Node2D
 
+signal cells_removed(cells: Array[Vector2i])
+
 const TerrainServiceValue = preload("res://src/gameplay/terrain_service.gd")
 
 ## Presentation and collision adapter for TerrainService.
@@ -49,6 +51,7 @@ func restore_solid(cell: Vector2i) -> bool:
 func _physics_process(_delta: float) -> void:
 	var had_pending_damage := not terrain.pending_damage.is_empty()
 	var changed := terrain.commit_damage()
+	if changed > 0: cells_removed.emit(terrain.last_removed_cells.duplicate())
 	if changed > 0:
 		_disable_dirty_chunk_collision()
 	if had_pending_damage: queue_redraw()
@@ -56,6 +59,18 @@ func _physics_process(_delta: float) -> void:
 	terrain.physics_tick()
 	for chunk in dirty_before:
 		if not terrain.dirty_chunks.has(chunk): _rebuild_chunk_collision(chunk)
+
+func apply_generated_map(map: Variant) -> void:
+	for body in chunk_bodies.values(): body.queue_free()
+	chunk_bodies.clear()
+	grid_size = Vector2i(map.grid_width, map.grid_height)
+	terrain = TerrainServiceValue.new(); terrain.setup(grid_size.x, grid_size.y)
+	for y in range(grid_size.y):
+		for x in range(grid_size.x):
+			if map.cell_value(Vector2i(x, y)) == 0: terrain.set_initial_empty(Vector2i(x, y))
+	for y in range(0, grid_size.y, TerrainServiceValue.CHUNK_SIZE):
+		for x in range(0, grid_size.x, TerrainServiceValue.CHUNK_SIZE): terrain.dirty_chunks[Vector2i(x / TerrainServiceValue.CHUNK_SIZE, y / TerrainServiceValue.CHUNK_SIZE)] = true
+	queue_redraw()
 
 func _disable_dirty_chunk_collision() -> void:
 	for chunk in terrain.dirty_chunks:

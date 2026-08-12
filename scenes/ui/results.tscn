@@ -1,13 +1,11 @@
 [gd_scene load_steps=2 format=3]
-[ext_resource path="res://scenes/ui/screen.gd" type="Script" id="1"]
+[ext_resource path="res://scenes/ui/results.gd" type="Script" id="1"]
 [node name="Results" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1")
-title_key = "results.title"
-next_mode = 3
 [node name="Panel" type="VBoxContainer" parent="."]
 offset_left = 180.0
 offset_top = 80.0
@@ -15,5 +13,9 @@ offset_right = 460.0
 offset_bottom = 280.0
 [node name="Title" type="Label" parent="Panel"]
 horizontal_alignment = 1
+[node name="Details" type="Label" parent="Panel"]
+custom_minimum_size = Vector2(280, 150)
+theme_override_font_sizes/font_size = 9
+autowrap_mode = 2
 [node name="Continue" type="Button" parent="Panel"]
-text = "Return to hub"
+text = ""

@@ -2,6 +2,7 @@ class_name M2Hud extends Control
 
 @export var rig_path: NodePath
 var rig: Node
+var controller: Node
 @onready var hull: Label = $BottomFrame/VitalsPanel/Hull
 @onready var energy: Label = $BottomFrame/VitalsPanel/Energy
 @onready var heat: Label = $BottomFrame/HeatPanel/Heat
@@ -17,11 +18,12 @@ var rig: Node
 
 func _ready() -> void:
 	rig = get_node_or_null(rig_path)
+	controller = rig.get_node_or_null("../M3DiveController") if rig != null else null
 	$PausePanel/PauseLabel.text = tr("m2.pause.title")
 	resume.text = tr("m2.pause.resume")
 	return_to_hub.text = tr("m2.pause.return_hub")
 	resume.pressed.connect(func(): if rig != null: rig.set_paused(false))
-	return_to_hub.pressed.connect(func(): SceneRouter.go_to(3))
+	return_to_hub.pressed.connect(func(): if controller != null: controller.request_abandon())
 	# Keep the prompt in sync immediately; later swaps arrive through its signal.
 	input_prompt.set_device_family(InputService.device_family)
 
@@ -34,7 +36,10 @@ func _process(_delta: float) -> void:
 	var heat_ratio := clampf(state.heat / 100.0, 0.0, 1.0)
 	heat_fill.size.x = 116.0 * heat_ratio
 	heat_fill.color = Color("dc5f58") if state.heat >= 85.0 else Color("e7ad52") if state.heat >= 70.0 else Color("49c3b1")
-	objective.text = (tr("m2.hud.objective") % int(rig.global_position.y)).replace("\\n", "\n")
+	if controller != null:
+		var run = controller.run
+		objective.text = (tr("m3.hud.objective") % [run.cargo_used, run.CARGO_CAPACITY, run.combo_multiplier(), run.combo_remaining]).replace("\\n", "\n")
+	else: objective.text = (tr("m2.hud.objective") % int(rig.global_position.y)).replace("\\n", "\n")
 	tool.text = tr("m2.hud.tool") % rig.tools.ammo
 	utility.text = tr("m2.hud.utility") % [rig.tools.sonar_cooldown, rig.tools.beacons.size()]
 	extraction.text = tr("m2.hud.extract") % minf(100.0, rig.tools.recall_seconds / rig.tools.RECALL_SECONDS * 100.0)

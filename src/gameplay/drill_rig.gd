@@ -5,6 +5,7 @@ const ControlFrameValue = preload("res://src/domain/control_frame.gd")
 const Tools = preload("res://src/domain/m2_tools.gd")
 const AppStateDefinition = preload("res://src/core/app_state.gd")
 @export var terrain_path: NodePath
+@export var run_controller_path: NodePath
 var state := RunState.new()
 var tools := Tools.new()
 var terrain: Node
@@ -54,11 +55,16 @@ func _physics_process(delta: float) -> void:
 		var cell := _cell_at(global_position + state.last_aim * 18.0)
 		if tools.blast_pins.is_empty(): tools.place_pin(cell)
 		else:
+			var controller := get_node_or_null(run_controller_path)
+			if controller != null and controller.has_method("mark_blast_damage"):
+				for pin in tools.blast_pins: controller.mark_blast_damage(pin)
 			if tools.detonate(terrain) > 0: _add_camera_trauma(0.35)
 	if frame.has_pressed(8): tools.activate_sonar()
 	if frame.has_pressed(16): tools.place_beacon(global_position)
 	if tools.tick(delta, frame.has_held(32), paused):
-		SceneRouter.go_to(AppStateDefinition.AppMode.RESULTS)
+		var controller := get_node_or_null(run_controller_path)
+		if controller != null and controller.has_method("request_extract"): controller.request_extract()
+		else: SceneRouter.go_to(AppStateDefinition.AppMode.RESULTS)
 		return
 	if has_node("M2Camera"):
 		$M2Camera.update_target(global_position, state.last_aim, velocity, delta)
@@ -135,6 +141,8 @@ func _on_run_failed() -> void:
 	velocity = Vector2.ZERO
 	_add_camera_trauma(1.0)
 	_update_sprite(false)
+	var controller := get_node_or_null(run_controller_path)
+	if controller != null and controller.has_method("request_destroyed"): controller.request_destroyed()
 
 func _cell_at(point: Vector2) -> Vector2i:
 	return Vector2i(floori(point.x / terrain.cell_size), floori(point.y / terrain.cell_size))

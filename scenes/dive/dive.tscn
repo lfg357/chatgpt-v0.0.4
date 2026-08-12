@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource path="res://scenes/dive/dive.gd" type="Script" id="1_dive"]
 [ext_resource path="res://src/gameplay/terrain_world.gd" type="Script" id="2_terrain"]
@@ -8,6 +8,8 @@
 [ext_resource path="res://assets/sprites/drill_default.tres" type="SpriteFrames" id="6_drill_frames"]
 [ext_resource path="res://src/gameplay/m2_feedback.gd" type="Script" id="7_feedback"]
 [ext_resource path="res://src/ui/input_prompt.gd" type="Script" id="8_input_prompt"]
+[ext_resource path="res://src/gameplay/m3_dive_controller.gd" type="Script" id="9_m3_controller"]
+[ext_resource path="res://src/tools/m3_debug_panel.gd" type="Script" id="10_debug"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rig"]
 radius = 6.0
@@ -60,12 +62,16 @@ visible = false
 script = ExtResource("2_terrain")
 cell_size = 8
 grid_size = Vector2i(80, 38)
-m2_graybox = true
+m2_graybox = false
+
+[node name="M3DiveController" type="Node2D" parent="."]
+script = ExtResource("9_m3_controller")
 
 [node name="DrillRig" type="CharacterBody2D" parent="."]
 position = Vector2(144, 156)
 script = ExtResource("3_rig")
 terrain_path = NodePath("../TerrainWorld")
+run_controller_path = NodePath("../M3DiveController")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DrillRig"]
 shape = SubResource("CircleShape2D_rig")
@@ -265,3 +271,41 @@ offset_top = 92.0
 offset_right = 200.0
 offset_bottom = 122.0
 text = ""
+
+[node name="M3DebugPanel" type="Panel" parent="HudLayer"]
+offset_left = 8.0
+offset_top = 36.0
+offset_right = 204.0
+offset_bottom = 192.0
+script = ExtResource("10_debug")
+controller_path = NodePath("../../M3DiveController")
+[node name="Info" type="Label" parent="HudLayer/M3DebugPanel"]
+offset_left = 6.0
+offset_top = 4.0
+offset_right = 190.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 8
+[node name="Success" type="Button" parent="HudLayer/M3DebugPanel"]
+offset_left = 6.0
+offset_top = 94.0
+offset_right = 50.0
+offset_bottom = 120.0
+text = "OK"
+[node name="Destroy" type="Button" parent="HudLayer/M3DebugPanel"]
+offset_left = 52.0
+offset_top = 94.0
+offset_right = 98.0
+offset_bottom = 120.0
+text = "FAIL"
+[node name="Abandon" type="Button" parent="HudLayer/M3DebugPanel"]
+offset_left = 100.0
+offset_top = 94.0
+offset_right = 150.0
+offset_bottom = 120.0
+text = "QUIT"
+[node name="Timeout" type="Button" parent="HudLayer/M3DebugPanel"]
+offset_left = 6.0
+offset_top = 124.0
+offset_right = 98.0
+offset_bottom = 150.0
+text = "BOILER TIMEOUT"
