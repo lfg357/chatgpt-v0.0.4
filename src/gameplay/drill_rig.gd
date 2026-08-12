@@ -39,6 +39,17 @@ func _physics_process(delta: float) -> void:
 	tools.tick(delta, frame.has_held(32), paused)
 	if has_node("M2Camera"):
 		$M2Camera.update_target(global_position, state.last_aim, velocity, delta)
+	_update_sprite(bool(result.drilling))
+
+func _update_sprite(drilling: bool) -> void:
+	if not has_node("Sprite"): return
+	var sprite: AnimatedSprite2D = $Sprite
+	var wanted := &"idle"
+	if state.shutdown_seconds > 0.0: wanted = &"overheat"
+	elif drilling: wanted = &"drill"
+	elif velocity.length() > 5.0: wanted = &"thrust"
+	if sprite.animation != wanted: sprite.play(wanted)
+	sprite.rotation = state.last_aim.angle()
 
 func _request_drill(aim: Vector2) -> void:
 	if terrain == null: return

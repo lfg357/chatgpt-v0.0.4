@@ -8,6 +8,17 @@ var _ignore_until_next_input := false
 
 const ControlFrameValue = preload("res://src/domain/control_frame.gd")
 
+func _ready() -> void:
+	_add_gamepad_defaults()
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventJoypadButton and event.pressed:
+		note_gamepad_input()
+	elif event is InputEventJoypadMotion and absf(event.axis_value) >= deadzone:
+		note_gamepad_input()
+	elif (event is InputEventKey or event is InputEventMouseButton) and event.is_pressed():
+		note_keyboard_mouse_input()
+
 func note_gamepad_input() -> void:
 	if device_family != &"gamepad": device_family = &"gamepad"; device_family_changed.emit(device_family)
 
@@ -46,3 +57,32 @@ func frame_from_actions(mouse_aim: Vector2, physics_frame: int) -> Variant:
 
 func rebind_conflict(existing_action: StringName, target_action: StringName) -> bool:
 	return existing_action != target_action and not existing_action.is_empty()
+
+func _add_gamepad_defaults() -> void:
+	# Xbox layout: left stick moves, right stick aims, A boosts, RT drills, LT uses tool.
+	_add_axis(&"move_left", JOY_AXIS_LEFT_X, -1.0)
+	_add_axis(&"move_right", JOY_AXIS_LEFT_X, 1.0)
+	_add_axis(&"move_up", JOY_AXIS_LEFT_Y, -1.0)
+	_add_axis(&"move_down", JOY_AXIS_LEFT_Y, 1.0)
+	_add_axis(&"aim_left", JOY_AXIS_RIGHT_X, -1.0)
+	_add_axis(&"aim_right", JOY_AXIS_RIGHT_X, 1.0)
+	_add_axis(&"aim_up", JOY_AXIS_RIGHT_Y, -1.0)
+	_add_axis(&"aim_down", JOY_AXIS_RIGHT_Y, 1.0)
+	_add_axis(&"drill", JOY_AXIS_TRIGGER_RIGHT, 1.0)
+	_add_axis(&"use_tool", JOY_AXIS_TRIGGER_LEFT, 1.0)
+	_add_button(&"boost", JOY_BUTTON_A)
+	_add_button(&"sonar", JOY_BUTTON_X)
+	_add_button(&"place_beacon", JOY_BUTTON_Y)
+	_add_button(&"recall", JOY_BUTTON_B)
+	_add_button(&"pause", JOY_BUTTON_START)
+
+func _add_axis(action: StringName, axis: JoyAxis, direction: float) -> void:
+	var event := InputEventJoypadMotion.new()
+	event.axis = axis
+	event.axis_value = direction
+	InputMap.action_add_event(action, event)
+
+func _add_button(action: StringName, button: JoyButton) -> void:
+	var event := InputEventJoypadButton.new()
+	event.button_index = button
+	InputMap.action_add_event(action, event)

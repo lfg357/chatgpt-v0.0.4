@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource path="res://scenes/dive/dive.gd" type="Script" id="1_dive"]
 [ext_resource path="res://src/gameplay/terrain_world.gd" type="Script" id="2_terrain"]
 [ext_resource path="res://src/gameplay/drill_rig.gd" type="Script" id="3_rig"]
 [ext_resource path="res://src/gameplay/m2_camera.gd" type="Script" id="4_camera"]
 [ext_resource path="res://src/ui/m2_hud.gd" type="Script" id="5_hud"]
+[ext_resource path="res://assets/sprites/drill_default.tres" type="SpriteFrames" id="6_drill_frames"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rig"]
 radius = 6.0
@@ -49,6 +50,13 @@ terrain_path = NodePath("../TerrainWorld")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DrillRig"]
 shape = SubResource("CircleShape2D_rig")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="DrillRig"]
+sprite_frames = ExtResource("6_drill_frames")
+animation = &"idle"
+autoplay = "idle"
+position = Vector2(0, 0)
+scale = Vector2(0.5, 0.5)
 
 [node name="M2Camera" type="Camera2D" parent="DrillRig"]
 position_smoothing_enabled = true
