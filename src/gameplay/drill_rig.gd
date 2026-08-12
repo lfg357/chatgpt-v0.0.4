@@ -11,6 +11,7 @@ var paused := false
 
 func _ready() -> void:
 	terrain = get_node_or_null(terrain_path)
+	Input.joy_connection_changed.connect(_on_joy_connection_changed)
 
 func set_paused(value: bool) -> void:
 	paused = value
@@ -56,5 +57,10 @@ func _cell_at(point: Vector2) -> Vector2i:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		set_paused(true)
+		InputService.clear_after_focus_loss()
+
+func _on_joy_connection_changed(_device: int, connected: bool) -> void:
+	if not connected:
 		set_paused(true)
 		InputService.clear_after_focus_loss()
