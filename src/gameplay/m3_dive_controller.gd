@@ -28,6 +28,7 @@ var show_budgets := false
 var show_reachable := false
 var show_chunks := false
 var completed := false
+var suppress_scene_transition := false
 @onready var terrain: Node = $"../TerrainWorld"
 @onready var rig: Node = $"../DrillRig"
 
@@ -118,9 +119,9 @@ func _update_room_interactions(delta: float) -> void:
 func _damage(amount: int, source: StringName) -> void:
 	run.damage(amount, source); rig.state.damage(amount)
 
-func request_extract() -> void: _finish(true, &"")
-func request_destroyed() -> void: _finish(false, &"destroyed")
-func request_abandon() -> void: _finish(false, &"abandoned")
+func request_extract() -> bool: return _finish(true, &"")
+func request_destroyed() -> bool: return _finish(false, &"destroyed")
+func request_abandon() -> bool: return _finish(false, &"abandoned")
 func force_boiler_timeout() -> void: run.boiler.active = true; run.boiler.remaining = 0.01
 func debug_restart(layer_id: StringName, seed: int) -> void:
 	if not OS.is_debug_build(): return
@@ -147,16 +148,18 @@ func debug_export() -> bool:
 	var file := FileAccess.open("res://reports/m3_debug_export.json", FileAccess.WRITE)
 	if file == null: return false
 	file.store_string(JSON.stringify(payload, "\t")); file.close(); return true
-func _finish(success: bool, reason: StringName) -> void:
-	if completed: return
+func _finish(success: bool, reason: StringName) -> bool:
+	if completed: return false
 	run.performance_summary = {"frames": frame_count, "average_update_ms": frame_total_ms / maxi(1, frame_count), "peak_update_ms": frame_peak_ms, "dirty_chunks": terrain.terrain.dirty_chunks.size()}
 	LoggerValue.record(&"performance_summary", run.performance_summary)
 	run.record_route(rig.global_position, rig.state.last_aim.angle(), _route_flags())
 	var result = run.finish(success, reason)
-	if result == null: return
+	if result == null: return false
 	var settlement = AppState.complete_run(result)
-	if settlement == null or not settlement.committed: return
-	completed = true; SceneRouter.go_to(AppStateDefinition.AppMode.RESULTS, {"result": result, "settlement": settlement})
+	if settlement == null or not settlement.committed: return false
+	completed = true
+	if not suppress_scene_transition: SceneRouter.go_to(AppStateDefinition.AppMode.RESULTS, {"result": result, "settlement": settlement})
+	return true
 
 func _near_module(id: StringName, distance: float) -> bool:
 	for room in generated_map.room_instances:
