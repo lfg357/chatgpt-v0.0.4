@@ -3,7 +3,7 @@ menu.title,Time Strata Drill Bureau,时层钻探局
 profile.title,Select Profile,选择档案
 hub.title,Hub: Archive Station,基地：档案站
 dive.title,Dive: Technical Validation,下潜：技术验证
-dive.sandbox.instruction,Left click removes one tile. Right click blasts a radius.,左键破坏单块；右键范围爆破。
+dive.sandbox.instruction,LMB drill · RMB tool · Q sonar · E beacon · Hold F extract,左键钻探 · 右键工具 · Q 声呐 · E 信标 · 长按 F 撤离
 dive.sandbox.status,Queued: %d | Dirty chunks: %d | Collision rebuilds: %d,待提交：%d｜脏分块：%d｜碰撞重建：%d
 dive.sandbox.back,Return to hub,返回基地
 results.title,Results: Greybox Record,结算：灰盒记录
