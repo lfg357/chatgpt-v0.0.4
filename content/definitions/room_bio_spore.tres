@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RoomModuleDef" load_steps=2 format=3]
+[ext_resource path="res://src/domain/room_module_def.gd" type="Script" id="1"]
+[resource]
+script=ExtResource("1")
+id=&"room_bio_spore"
+layer_id=&"layer_bio"
+size_cells=Vector2i(20,20)
+connectors=Array[StringName]([&"N",&"E",&"S",&"W"])
+tags=Array[StringName]([&"risk"])
+risk=2
+mineral_budget=4
+hazard_budget=3

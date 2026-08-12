@@ -11,13 +11,17 @@ func load_all() -> ResultValue:
 	_load_localization()
 	var dir := DirAccess.open("res://content/definitions")
 	if dir == null: return ResultValue.success()
+	var duplicate_ids: Array[StringName] = []
 	dir.list_dir_begin()
 	var name := dir.get_next()
 	while name != "":
 		if name.ends_with(".tres"):
 			var definition := load("res://content/definitions/" + name) as ContentDefValue
-			if definition != null and definition.id != &"": definitions[definition.id] = definition
+			if definition != null and definition.id != &"":
+				if definitions.has(definition.id): duplicate_ids.append(definition.id)
+				else: definitions[definition.id] = definition
 		name = dir.get_next()
+	if not duplicate_ids.is_empty(): return ResultValue.failure(&"duplicate_content_id")
 	return ResultValue.success(definitions.size())
 
 func _load_localization() -> void:
@@ -47,5 +51,7 @@ func _exit_tree() -> void:
 func get_def(id: StringName, expected_type: StringName = &"") -> ContentDefValue:
 	var definition: ContentDefValue = definitions.get(id)
 	if definition == null: return null
-	if expected_type != &"" and definition.get_class() != expected_type: return null
+	if expected_type != &"":
+		var script := definition.get_script() as Script
+		if script == null or script.get_global_name() != String(expected_type): return null
 	return definition

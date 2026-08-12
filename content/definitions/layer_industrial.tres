@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="LayerDef" load_steps=2 format=3]
+[ext_resource path="res://src/domain/layer_def.gd" type="Script" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"layer_industrial"
+name_key = &"layer.industrial.name"
+description_key = &"layer.industrial.description"
+first_seed = 170101
+entry_room_id = &"room_ind_entry"
+normal_room_ids = Array[StringName]([&"room_ind_vein", &"room_ind_shaft"])
+risk_room_ids = Array[StringName]([&"room_ind_steam_cross", &"room_ind_cable_vault", &"room_ind_mite_nest"])
+supply_room_id = &"room_ind_supply"
+relic_room_id = &"room_ind_relic"
+core_room_id = &"room_ind_core"
+min_risk_branches = 1
+max_risk_branches = 2

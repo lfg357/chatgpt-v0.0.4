@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RoomModuleDef" load_steps=2 format=3]
+[ext_resource path="res://src/domain/room_module_def.gd" type="Script" id="1"]
+[resource]
+script=ExtResource("1")
+id=&"room_ind_mite_nest"
+layer_id=&"layer_industrial"
+size_cells=Vector2i(20,16)
+connectors=Array[StringName]([&"W",&"E",&"S",&"N"])
+tags=Array[StringName]([&"risk"])
+risk=2
+mineral_budget=6
+creature_budget=1

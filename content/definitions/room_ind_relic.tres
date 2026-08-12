@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RoomModuleDef" load_steps=2 format=3]
+[ext_resource path="res://src/domain/room_module_def.gd" type="Script" id="1"]
+[resource]
+script=ExtResource("1")
+id=&"room_ind_relic"
+layer_id=&"layer_industrial"
+size_cells=Vector2i(24,20)
+connectors=Array[StringName]([&"W",&"E"])
+tags=Array[StringName]([&"relic"])
+risk=3
+hazard_budget=3

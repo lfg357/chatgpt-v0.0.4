@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RoomModuleDef" load_steps=2 format=3]
+[ext_resource path="res://src/domain/room_module_def.gd" type="Script" id="1"]
+[resource]
+script=ExtResource("1")
+id=&"room_mech_saw"
+layer_id=&"layer_mech"
+size_cells=Vector2i(22,18)
+connectors=Array[StringName]([&"W",&"E",&"N"])
+tags=Array[StringName]([&"risk"])
+risk=3
+hazard_budget=2
