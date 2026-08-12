@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="HazardDef" load_steps=2 format=3]
+[ext_resource path="res://src/domain/hazard_def.gd" type="Script" id="1"]
+[resource]
+script=ExtResource("1")
+id=&"hazard_shale"
+layer_id=&"layer_industrial"
+damage=20
+interval_seconds=0.6
