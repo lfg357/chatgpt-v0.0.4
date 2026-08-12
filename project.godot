@@ -37,5 +37,16 @@ common/physics_ticks_per_second=60
 [input]
 move_left={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":65)]}
 move_right={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":68)]}
+move_up={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":87)]}
+move_down={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":83)]}
+aim_left={"deadzone":0.18,"events":[]}
+aim_right={"deadzone":0.18,"events":[]}
+aim_up={"deadzone":0.18,"events":[]}
+aim_down={"deadzone":0.18,"events":[]}
 drill={"deadzone":0.5,"events":[Object(InputEventMouseButton,"button_index":1)]}
+use_tool={"deadzone":0.5,"events":[Object(InputEventMouseButton,"button_index":2)]}
+boost={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":4194325)]}
+sonar={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":81)]}
+place_beacon={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":69)]}
+recall={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":70)]}
 pause={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":4194305)]}

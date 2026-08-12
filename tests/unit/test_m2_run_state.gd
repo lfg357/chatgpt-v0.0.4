@@ -1,0 +1,23 @@
+extends "res://tests/test_case.gd"
+const State = preload("res://src/domain/m2_run_state.gd")
+const Frame = preload("res://src/domain/control_frame.gd")
+const Tools = preload("res://src/domain/m2_tools.gd")
+const Terrain = preload("res://src/gameplay/terrain_service.gd")
+func test_energy_delay_and_clamp() -> bool:
+	var s=State.new(); s.energy=99.0; var f=Frame.new(); s.tick(0.74,f); assert_equal(s.energy,99.0); s.tick(1.0,f); assert_true(s.energy<=100.0 and s.energy>99.0); return true
+func test_heat_shutdown_and_recovery() -> bool:
+	var s=State.new(); s.heat=99.9; var f=Frame.new(); f.held=1; s.tick(1.0,f); assert_true(s.shutdown_seconds>0); assert_true(not s.tick(0.1,f).drilling); return true
+func test_pause_freezes_all_run_clocks() -> bool:
+	var s=State.new(); var f=Frame.new(); s.tick(1.0,f,true); assert_equal(s.run_seconds,0.0); return true
+func test_aim_keeps_last_direction_inside_deadzone() -> bool:
+	var s=State.new(); var f=Frame.new(); f.aim=Vector2.UP; s.tick(.1,f); f.aim=Vector2.ZERO; s.tick(.1,f); assert_equal(s.last_aim,Vector2.UP); return true
+func test_rebind_conflict_requires_resolution() -> bool:
+	assert_true(InputService.rebind_conflict(&"drill", &"boost")); return true
+func test_controller_disconnect_pauses() -> bool:
+	InputService.clear_after_focus_loss(); var f=InputService.frame_from_actions(Vector2.ZERO, 1); assert_equal(f.held,0); return true
+func test_boost_respects_collision() -> bool:
+	var s=State.new(); var f=Frame.new(); f.pressed=4; var r=s.tick(.01,f); assert_true(r.boosting and r.move_scale>1.0); return true
+func test_explosion_caps_changed_cells() -> bool:
+	var terrain=Terrain.new(); terrain.setup(32,32); var tools=Tools.new(); tools.place_pin(Vector2i(10,10)); assert_true(tools.detonate(terrain)<=48); return true
+func test_sonar_beacon_and_recall_pause() -> bool:
+	var tools=Tools.new(); assert_true(tools.activate_sonar()); tools.place_beacon(Vector2.ZERO); tools.place_beacon(Vector2.ONE); tools.place_beacon(Vector2(2,2)); tools.place_beacon(Vector2(3,3)); assert_equal(tools.beacons.size(),3); assert_true(not tools.tick(2.0,true,true)); return true

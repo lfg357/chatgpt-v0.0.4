@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource path="res://scenes/dive/dive.gd" type="Script" id="1_dive"]
 [ext_resource path="res://src/gameplay/terrain_world.gd" type="Script" id="2_terrain"]
+[ext_resource path="res://src/gameplay/drill_rig.gd" type="Script" id="3_rig"]
 
 [node name="Dive" type="Control"]
 layout_mode = 3
@@ -34,6 +35,14 @@ position = Vector2(64, 86)
 script = ExtResource("2_terrain")
 cell_size = 8
 grid_size = Vector2i(64, 26)
+
+[node name="DrillRig" type="CharacterBody2D" parent="."]
+position = Vector2(112, 130)
+script = ExtResource("3_rig")
+terrain_path = NodePath("../TerrainWorld")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DrillRig"]
+shape = null
 
 [node name="Status" type="Label" parent="."]
 layout_mode = 0
