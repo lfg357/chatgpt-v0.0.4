@@ -24,8 +24,13 @@ function Write-Status([string]$State, [string]$Message = '') {
 
 Write-Status 'running'
 try {
-    & powershell -ExecutionPolicy Bypass -File (Join-Path $scriptRoot 'verify.ps1') -GodotBin $GodotBin *> $logPath
-    if ($LASTEXITCODE -ne 0) { throw "verify.ps1 exited $LASTEXITCODE" }
+    $previousPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        & powershell -ExecutionPolicy Bypass -File (Join-Path $scriptRoot 'verify.ps1') -GodotBin $GodotBin *> $logPath
+        $verifyExitCode = $LASTEXITCODE
+    } finally { $ErrorActionPreference = $previousPreference }
+    if ($verifyExitCode -ne 0) { throw "verify.ps1 exited $verifyExitCode" }
     Write-Status 'passed' 'Full unified verification passed.'
     exit 0
 } catch {
