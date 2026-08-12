@@ -24,7 +24,7 @@ results.empty,No completed dive record.,没有已完成的下潜记录。
 results.success,SUCCESS,成功
 results.destroyed,DESTROYED,损毁
 results.abandoned,ABANDONED,放弃
-results.summary,"%s | %.1fs\n%s\nBANKED S%d D%d | LOST S%d D%d\nDAMAGE %d | SEED %d\nHASH %s","%s｜%.1f秒\n%s\n入库 废%d 数%d｜损失 废%d 数%d\n伤害 %d｜种子 %d\n哈希 %s"
+results.summary,%s | %.1fs\n%s\nBANKED S%d D%d | LOST S%d D%d\nDAMAGE %d | SEED %d\nHASH %s,%s｜%.1f秒\n%s\n入库 废%d 数%d｜损失 废%d 数%d\n伤害 %d｜种子 %d\n哈希 %s
 error.illegal_transition,The requested flow transition is not allowed.,当前流程不能切换到目标页面。
 m2.hud.hull,HULL %03d,耐久 %03d
 m2.hud.energy,ENERGY %03d,能量 %03d
@@ -34,7 +34,7 @@ m2.hud.objective,M2 GREYBOX\nDEPTH %03d,M2 灰盒\n深度 %03d
 m2.hud.tool,BLAST PIN %d,爆破钉 %d
 m2.hud.utility,SONAR %.1f  BEACON %d,声呐 %.1f  信标 %d
 m2.hud.extract,HOLD F: EXTRACT %.0f%%,长按 F：撤离 %.0f%%
-m3.hud.objective,"CARGO %d/%d\nCOMBO x%.1f %.1fs","货舱 %d/%d\n连击 x%.1f %.1f秒"
+m3.hud.objective,CARGO %d/%d\nCOMBO x%.1f %.1fs,货舱 %d/%d\n连击 x%.1f %.1f秒
 m2.pause.title,PAUSED,已暂停
 m2.pause.resume,RESUME,继续
 m2.pause.return_hub,RETURN TO HUB,返回基地

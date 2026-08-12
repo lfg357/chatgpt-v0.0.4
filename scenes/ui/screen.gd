@@ -75,7 +75,7 @@ func _draw() -> void:
 	draw_rect(Rect2(16, 14, size.x - 32, size.y - 28), Color("142236"), false, 2.0)
 	draw_line(Vector2(32, 48), Vector2(size.x - 32, 48), Color("34566d"), 1.0)
 	draw_string(ThemeDB.fallback_font, Vector2(32, 37), "TSD // ARCHIVE TERMINAL", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("7898a7"))
-	draw_string(ThemeDB.fallback_font, Vector2(size.x - 174, 37), "LINK  STABLE  •  M2", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("67c8b4"))
+	draw_string(ThemeDB.fallback_font, Vector2(size.x - 174, 37), "LINK  STABLE  •  M3", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("67c8b4"))
 	for x in range(34, int(size.x) - 34, 28):
 		draw_rect(Rect2(x, size.y - 32, 14, 3), Color("263f53"))
 	draw_circle(Vector2(44, 65), 4, Color("d69a55"))

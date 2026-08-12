@@ -45,8 +45,9 @@ func test_failure_loses_half_flooring() -> bool:
 	return true
 
 func test_failure_loses_all_unbanked_cores() -> bool:
-	var run = _run(); var result = run.finish(false, &"destroyed"); var settlement = Economy.new().apply_run_result(result)
-	assert_equal(settlement.banked_resources.core, 0); assert_equal(settlement.lost_resources.core, 0)
+	var run = _run(); var core_entry = preload("res://src/domain/cargo_entry.gd").new(); core_entry.mineral_id = &"core"; core_entry.count = 3; run.cargo[&"core"] = core_entry
+	var result = run.finish(false, &"destroyed"); var settlement = Economy.new().apply_run_result(result)
+	assert_equal(settlement.banked_resources.core, 0); assert_equal(settlement.lost_resources.core, 3)
 	return true
 
 func test_terminal_result_is_mutually_exclusive_and_idempotent() -> bool:

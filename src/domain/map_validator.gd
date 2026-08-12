@@ -45,6 +45,9 @@ func _check_corridors(map: Variant, report: Variant) -> void:
 		var to_dir: StringName = corridor.get("to_dir", &"")
 		if not ((from_dir == &"E" and to_dir == &"W") or (from_dir == &"S" and to_dir == &"N")):
 			report.error_codes.append(&"anchor_mismatch")
+		var from_room: Dictionary = map.room_instances[int(corridor.from)]
+		var to_room: Dictionary = map.room_instances[int(corridor.to)]
+		if not from_room.connectors.has(from_dir) or not to_room.connectors.has(to_dir): report.error_codes.append(&"anchor_not_declared")
 
 func _flood(map: Variant, start: Vector2i) -> Dictionary:
 	var reached: Dictionary = {}

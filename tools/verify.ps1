@@ -61,9 +61,12 @@ Invoke-GodotChecked -GodotArgs $m2Args
 Write-Host '11/13 M3 production dive endurance'
 Invoke-GodotChecked @('--script', 'res://tools/m3_endurance.gd')
 Write-Host '12/13 M3 deterministic seed gate'
-$m3Args = @('--script', 'res://tools/m3_seed_validation.gd')
-if ($Quick) { $m3Args += @('--', '--quick') }
-Invoke-GodotChecked -GodotArgs $m3Args
+if ($Quick) {
+    & powershell -ExecutionPolicy Bypass -File tools\m3_seed_validation.ps1 -GodotBin $GodotBin -Quick
+} else {
+    & powershell -ExecutionPolicy Bypass -File tools\m3_seed_validation.ps1 -GodotBin $GodotBin
+}
+if ($LASTEXITCODE -ne 0) { throw 'M3 deterministic seed gate failed.' }
 Write-Host '13/13 M2 human acceptance gate'
 & powershell -ExecutionPolicy Bypass -File tools\m2_acceptance_gate.ps1
 if ($LASTEXITCODE -ne 0) { throw 'M2 human acceptance gate failed.' }

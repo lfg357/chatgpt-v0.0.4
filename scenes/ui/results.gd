@@ -10,4 +10,4 @@ func _ready() -> void:
 	var cargo_lines: Array[String] = []
 	for entry in result.cargo: cargo_lines.append("%s x%d  S%d D%d" % [entry.mineral_id, entry.count, entry.scrap_value, entry.data_value])
 	var outcome := tr("results.success") if result.success else tr("results.destroyed") if result.failure_reason == &"destroyed" else tr("results.abandoned")
-	$Panel/Details.text = tr("results.summary") % [outcome, result.duration_ms / 1000.0, "\n".join(cargo_lines), settlement.banked_resources.scrap, settlement.banked_resources.data, settlement.lost_resources.scrap, settlement.lost_resources.data, result.damage_taken, result.config.seed, result.topology_hash]
+	$Panel/Details.text = (tr("results.summary") % [outcome, result.duration_ms / 1000.0, "\n".join(cargo_lines), settlement.banked_resources.scrap, settlement.banked_resources.data, settlement.lost_resources.scrap, settlement.lost_resources.data, result.damage_taken, result.config.seed, result.topology_hash.substr(0, 16)]).replace("\\n", "\n").trim_prefix("\"").trim_suffix("\"")

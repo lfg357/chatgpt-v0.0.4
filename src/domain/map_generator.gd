@@ -34,6 +34,8 @@ func _build(layer: Variant, seed: int, attempt: int, fallback: bool):
 		var node_count := rng.randi_range(layer.min_main_nodes, layer.max_main_nodes)
 		main_ids.append(layer.entry_room_id)
 		for _i in range(node_count - 4): main_ids.append(layer.normal_room_ids[rng.randi_range(0, layer.normal_room_ids.size() - 1)])
+		if not layer.risk_room_ids.is_empty() and not _has_connector(main_ids, layer, &"S") and main_ids.size() > 1:
+			main_ids[1] = _first_with_connector(layer.normal_room_ids, &"S")
 		var supply_at := rng.randi_range(1, maxi(1, main_ids.size() - 1))
 		main_ids.insert(supply_at, layer.supply_room_id)
 		main_ids.insert(main_ids.size(), layer.relic_room_id)
@@ -60,7 +62,11 @@ func _layout(layer: Variant, result: Variant, main_ids: Array[StringName], branc
 	var total_width := x + 4
 	var branch_y := 38
 	for branch_index in range(branch_count):
-		var parent_index := 1 + branch_index % maxi(1, main_ids.size() - 2)
+		var parent_candidates: Array[int] = []
+		for candidate_index in range(1, main_ids.size() - 1):
+			if modules[main_ids[candidate_index]].connectors.has(&"S"): parent_candidates.append(candidate_index)
+		if parent_candidates.is_empty(): break
+		var parent_index: int = parent_candidates[branch_index % parent_candidates.size()]
 		var module: Variant = modules[layer.risk_room_ids[rng.randi_range(0, layer.risk_room_ids.size() - 1)]]
 		var bx: int = main_centers[parent_index].x - int(module.size_cells.x) / 2
 		var instance := _instance(module, Vector2i(bx, branch_y + branch_index * 28), result.room_instances.size(), parent_index, &"risk")
@@ -104,6 +110,18 @@ func _module_lookup(layer: Variant) -> Dictionary:
 	for id in [layer.entry_room_id, layer.supply_room_id, layer.relic_room_id, layer.core_room_id] + layer.normal_room_ids + layer.risk_room_ids:
 		lookup[id] = database.get_def(id, &"RoomModuleDef")
 	return lookup
+
+func _has_connector(ids: Array[StringName], layer: Variant, direction: StringName) -> bool:
+	for id in ids:
+		var room = Engine.get_main_loop().root.get_node("ContentDB").get_def(id, &"RoomModuleDef") if content_db == null else content_db.get_def(id, &"RoomModuleDef")
+		if room != null and room.connectors.has(direction): return true
+	return false
+
+func _first_with_connector(ids: Array[StringName], direction: StringName) -> StringName:
+	var database: Variant = content_db if content_db != null else get_node_content_db()
+	for id in ids:
+		if database.get_def(id, &"RoomModuleDef").connectors.has(direction): return id
+	return ids[0]
 
 func get_node_content_db() -> Variant:
 	return Engine.get_main_loop().root.get_node("ContentDB")

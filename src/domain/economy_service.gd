@@ -12,7 +12,8 @@ func apply_run_result(result: Variant):
 	if applied_run_ids.has(result.run_id): settlement.error_code = &"already_settled"; return settlement
 	var totals := {"scrap": 0, "data": 0, "core": 0}
 	for entry in result.cargo:
-		totals.scrap += entry.scrap_value; totals.data += entry.data_value
+		if entry.mineral_id == &"core": totals.core += entry.count
+		else: totals.scrap += entry.scrap_value; totals.data += entry.data_value
 	if result.success:
 		settlement.outcome = &"success"; settlement.banked_resources = totals.duplicate()
 	elif result.failure_reason == &"destroyed":
@@ -33,4 +34,3 @@ func apply_run_result(result: Variant):
 		snapshot.economy = economy_copy
 	applied_run_ids[result.run_id] = true; settlement.committed = true
 	return settlement
-

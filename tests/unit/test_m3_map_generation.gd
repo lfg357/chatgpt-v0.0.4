@@ -44,6 +44,13 @@ func test_different_seeds_produce_legal_variation() -> bool:
 	assert_true(a.topology_hash != b.topology_hash)
 	return true
 
+func test_corridor_anchors_are_declared_by_both_rooms() -> bool:
+	var map = Generator.new().generate(_layer(&"layer_industrial"), 5)
+	for corridor in map.corridors:
+		assert_true(map.room_instances[corridor.from].connectors.has(corridor.from_dir))
+		assert_true(map.room_instances[corridor.to].connectors.has(corridor.to_dir))
+	return true
+
 func test_all_content_ids_unique_and_references_valid() -> bool:
 	assert_equal(ContentDB.definitions.size(), 37)
 	for layer_id in [&"layer_industrial", &"layer_bio", &"layer_mech"]:
