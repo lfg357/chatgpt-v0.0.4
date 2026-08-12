@@ -20,8 +20,11 @@ try {
     # QA invokes this script both from a Git checkout and from a previously
     # extracted git archive.  The latter deliberately has no .git directory;
     # it is already the cache-free snapshot and must not try to archive again.
-    & git -C $workspace rev-parse --is-inside-work-tree 2>$null | Out-Null
-    if ($LASTEXITCODE -eq 0) {
+    $previousPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try { $isGitCheckout = ((& git -C $workspace rev-parse --is-inside-work-tree 2>$null) -eq 'true') }
+    finally { $ErrorActionPreference = $previousPreference }
+    if ($isGitCheckout) {
         $scratch = Join-Path ([System.IO.Path]::GetTempPath()) ("m2-cold-import-" + [guid]::NewGuid().ToString('N'))
         $archive = Join-Path $scratch 'snapshot.zip'
         $snapshot = Join-Path $scratch 'project'
