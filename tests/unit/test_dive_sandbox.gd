@@ -62,6 +62,15 @@ func test_drill_breaks_the_first_solid_cell_at_the_visible_tip() -> bool:
 	dive.queue_free()
 	return true
 
+func test_drill_hit_spawns_visible_feedback() -> bool:
+	var dive := DiveScene.instantiate()
+	runner_tree.root.add_child(dive)
+	var feedback = dive.get_node("M2Feedback")
+	feedback.on_drill_hit(Vector2(160, 160), Vector2.RIGHT, 1)
+	assert_equal(feedback.drill_hits.size(), 1, "a successful drill hit must create visible feedback")
+	dive.queue_free()
+	return true
+
 func test_extraction_routes_to_results_state() -> bool:
 	var dive := DiveScene.instantiate()
 	runner_tree.root.add_child(dive)

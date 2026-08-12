@@ -10,6 +10,7 @@ var tools := Tools.new()
 var terrain: Node
 var paused := false
 var _was_colliding := false
+var _drill_feedback_cooldown := 0.0
 
 const DRILL_CONTACT_REACH := 7.0
 const DRILL_MAX_REACH := 26.0
@@ -28,6 +29,7 @@ func set_paused(value: bool) -> void:
 		InputService.suppress_gameplay_for_frames()
 
 func _physics_process(delta: float) -> void:
+	_drill_feedback_cooldown = maxf(0.0, _drill_feedback_cooldown - delta)
 	var mouse_aim := get_global_mouse_position() - global_position
 	var frame = InputService.frame_from_actions(mouse_aim, Engine.get_physics_frames())
 	if frame.has_pressed(64): set_paused(not paused)
@@ -88,6 +90,9 @@ func _request_drill(aim: Vector2) -> int:
 		if queued > 0: break
 		distance += DRILL_SAMPLE_STEP
 	if queued > 0: _add_camera_trauma(0.025)
+	if queued > 0 and _drill_feedback_cooldown <= 0.0:
+		_emit_drill_feedback(global_position + direction * DRILL_CONTACT_REACH, direction, queued)
+		_drill_feedback_cooldown = 0.055
 	return queued
 
 func _drill_cells(center: Vector2i, direction: Vector2) -> Array[Vector2i]:
@@ -97,6 +102,13 @@ func _drill_cells(center: Vector2i, direction: Vector2) -> Array[Vector2i]:
 
 func _add_camera_trauma(amount: float) -> void:
 	if has_node("M2Camera"): $M2Camera.add_trauma(amount)
+
+func _emit_drill_feedback(hit_point: Vector2, direction: Vector2, strength: int) -> void:
+	var feedback := get_node_or_null("../M2Feedback")
+	if feedback != null and feedback.has_method("on_drill_hit"):
+		feedback.call("on_drill_hit", hit_point, direction, strength)
+	if has_node("Sprite"):
+		$Sprite.position = -direction * 1.5
 
 func _consume_collision_impact(is_colliding: bool, impact_speed: float) -> bool:
 	var should_shake := is_colliding and not _was_colliding and impact_speed >= 70.0
