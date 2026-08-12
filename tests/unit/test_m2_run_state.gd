@@ -24,6 +24,8 @@ func test_sonar_beacon_and_recall_pause() -> bool:
 	var tools=Tools.new(); assert_true(tools.activate_sonar()); tools.place_beacon(Vector2.ZERO); tools.place_beacon(Vector2.ONE); tools.place_beacon(Vector2(2,2)); tools.place_beacon(Vector2(3,3)); assert_equal(tools.beacons.size(),3); assert_true(not tools.tick(2.0,true,true)); return true
 func test_camera_lookahead_and_map_bounds() -> bool:
 	var camera=Camera.new(); runner_tree.root.add_child(camera); camera.map_bounds=Rect2(0,0,2000,1000); camera.update_target(Vector2(5,5),Vector2.LEFT,Vector2.ZERO,1.0); assert_true(camera.global_position.x>=320.0); camera.queue_free(); return true
+func test_camera_shake_percent_zero_has_no_offset() -> bool:
+	var camera=Camera.new(); runner_tree.root.add_child(camera); camera.shake_percent=0.0; camera.add_trauma(1.0); camera.update_target(Vector2.ZERO,Vector2.RIGHT,Vector2.ZERO,0.1); assert_equal(camera.offset,Vector2.ZERO); camera.queue_free(); return true
 func test_energy_empty_still_recovers_without_underflow() -> bool:
 	var s=State.new(); s.energy=0.0; var f=Frame.new(); s.tick(1.0,f); assert_true(s.energy>0.0 and s.energy<=100.0); return true
 func test_gamepad_defaults_are_mapped() -> bool:

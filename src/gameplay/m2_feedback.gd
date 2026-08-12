@@ -18,7 +18,7 @@ func _draw() -> void:
 	for beacon in rig.tools.beacons:
 		draw_colored_polygon(PackedVector2Array([beacon + Vector2(0, -7), beacon + Vector2(5, 0), beacon + Vector2(0, 7), beacon + Vector2(-5, 0)]), Color("73d1c8"))
 	for pin in rig.tools.blast_pins:
-		var point: Vector2 = Vector2(pin) * float(rig.terrain.cell_size) + Vector2.ONE * float(rig.terrain.cell_size) * 0.5
+		var point: Vector2 = rig.terrain.to_global(Vector2(pin) * float(rig.terrain.cell_size) + Vector2.ONE * float(rig.terrain.cell_size) * 0.5)
 		draw_circle(point, 4.0, Color("d85b6a"))
 	if rig.tools.sonar_seconds > 0.0:
 		var radius := fmod(sonar_phase * 100.0, 96.0)
