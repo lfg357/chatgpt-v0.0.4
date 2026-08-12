@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MineralDef" load_steps=2 format=3]
+[ext_resource path="res://src/domain/mineral_def.gd" type="Script" id="1"]
+[resource]
+script=ExtResource("1")
+id=&"ore_lumen"
+layer_id=&"layer_industrial"
+hardness=1.8
+scrap_value=4
+data_value=2
