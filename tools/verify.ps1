@@ -33,10 +33,14 @@ Write-Host '7/8 M1 performance gate'
 $benchmarkArgs = @('--script', 'res://tools/benchmark_m1.gd')
 if ($Quick) { $benchmarkArgs += @('--', '--quick') }
 Invoke-GodotChecked -GodotArgs $benchmarkArgs
-Write-Host '8/8 M1 endurance memory gate'
+Write-Host '8/9 M1 endurance memory gate'
 & powershell -ExecutionPolicy Bypass -File tools\endurance_selftest.ps1 -GodotBin $GodotBin
 if ($LASTEXITCODE -ne 0) { throw 'Endurance gate self-test failed.' }
 $enduranceArgs = @('--script', 'res://tools/terrain_endurance.gd')
 if ($Quick) { $enduranceArgs += @('--', '--quick') }
 Invoke-GodotChecked -GodotArgs $enduranceArgs
+Write-Host '9/9 M2 control endurance'
+$m2Args = @('--script', 'res://tools/m2_endurance.gd')
+if ($Quick) { $m2Args += @('--', '--quick') }
+Invoke-GodotChecked -GodotArgs $m2Args
 Write-Host 'Verification passed.'
