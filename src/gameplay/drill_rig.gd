@@ -15,7 +15,9 @@ func _ready() -> void:
 
 func set_paused(value: bool) -> void:
 	paused = value
-	if not paused: InputService.clear_after_focus_loss()
+	if not paused:
+		InputService.clear_after_focus_loss()
+		InputService.suppress_gameplay_for_frames()
 
 func _physics_process(delta: float) -> void:
 	var mouse_aim := get_global_mouse_position() - global_position

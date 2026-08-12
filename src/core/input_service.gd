@@ -5,6 +5,7 @@ var deadzone := 0.18
 var _last_aim := Vector2.RIGHT
 var _previous_held := 0
 var _ignore_until_next_input := false
+var _suppressed_physics_frames := 0
 
 const ControlFrameValue = preload("res://src/domain/control_frame.gd")
 
@@ -29,8 +30,15 @@ func clear_after_focus_loss() -> void:
 	_previous_held = 0
 	_ignore_until_next_input = true
 
+func suppress_gameplay_for_frames(frames: int = 2) -> void:
+	_suppressed_physics_frames = maxi(_suppressed_physics_frames, frames)
+	_previous_held = 0
+
 func frame_from_actions(mouse_aim: Vector2, physics_frame: int) -> Variant:
 	var frame := ControlFrameValue.new()
+	if _suppressed_physics_frames > 0:
+		_suppressed_physics_frames -= 1
+		return frame
 	var move := Input.get_vector(&"move_left", &"move_right", &"move_up", &"move_down")
 	var stick := Input.get_vector(&"aim_left", &"aim_right", &"aim_up", &"aim_down", deadzone)
 	var has_gamepad_aim := stick.length() >= deadzone
@@ -39,9 +47,11 @@ func frame_from_actions(mouse_aim: Vector2, physics_frame: int) -> Variant:
 	elif mouse_aim.length() > 0.001:
 		note_keyboard_mouse_input(); _last_aim = mouse_aim.normalized()
 	var held := 0
+	var ui_has_mouse := get_viewport().gui_get_hovered_control() != null
 	var pairs := [[&"drill", 1], [&"use_tool", 2], [&"boost", 4], [&"sonar", 8], [&"place_beacon", 16], [&"recall", 32], [&"pause", 64]]
 	for pair in pairs:
-		if Input.is_action_pressed(pair[0]): held |= pair[1]
+		if Input.is_action_pressed(pair[0]) and not (ui_has_mouse and (pair[1] == 1 or pair[1] == 2)):
+			held |= pair[1]
 	if _ignore_until_next_input:
 		if held == 0 and move.length_squared() == 0.0: return frame
 		_ignore_until_next_input = false

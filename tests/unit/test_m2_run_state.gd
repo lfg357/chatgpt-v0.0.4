@@ -30,3 +30,8 @@ func test_gamepad_defaults_are_mapped() -> bool:
 	assert_true(InputMap.action_get_events(&"drill").size() >= 2)
 	assert_true(InputMap.action_get_events(&"aim_right").size() >= 1)
 	return true
+func test_resume_suppresses_residual_mouse_actions() -> bool:
+	InputService.suppress_gameplay_for_frames(1)
+	var frame=InputService.frame_from_actions(Vector2.RIGHT, 99)
+	assert_equal(frame.held, 0)
+	return true
