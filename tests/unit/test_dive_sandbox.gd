@@ -10,6 +10,9 @@ func test_dive_scene_exposes_terrain_validation_sandbox() -> bool:
 	assert_true(dive.has_node("M2Hud"))
 	assert_true(dive.has_node("M2Hud/PausePanel/Resume"))
 	assert_true(dive.has_node("M2Hud/PausePanel/ReturnToHub"))
+	var panel: Panel = dive.get_node("M2Hud/PausePanel")
+	var return_button: Button = dive.get_node("M2Hud/PausePanel/ReturnToHub")
+	assert_true(return_button.position.y + return_button.size.y <= panel.size.y, "pause panel wraps all buttons")
 	dive.free()
 	return true
 
