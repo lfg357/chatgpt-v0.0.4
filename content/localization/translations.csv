@@ -24,7 +24,7 @@ results.empty,No completed dive record.,没有已完成的下潜记录。
 results.success,SUCCESS,成功
 results.destroyed,DESTROYED,损毁
 results.abandoned,ABANDONED,放弃
-results.summary,%s | %.1fs\n%s\nBANKED S%d D%d | LOST S%d D%d\nDAMAGE %d | SEED %d\nHASH %s,%s｜%.1f秒\n%s\n入库 废%d 数%d｜损失 废%d 数%d\n伤害 %d｜种子 %d\n哈希 %s
+results.summary,%s | %.1fs\n%s\nBANKED S%d D%d | LOST S%d D%d\nDISCOVERY %s | DAMAGE %d | OVERHEAT %d\nSEED %d | HASH %s | ROUTE %d,%s｜%.1f秒\n%s\n入库 废%d 数%d｜损失 废%d 数%d\n发现 %s｜伤害 %d｜过热 %d\n种子 %d｜哈希 %s｜路线 %d
 error.illegal_transition,The requested flow transition is not allowed.,当前流程不能切换到目标页面。
 m2.hud.hull,HULL %03d,耐久 %03d
 m2.hud.energy,ENERGY %03d,能量 %03d
@@ -38,3 +38,4 @@ m3.hud.objective,CARGO %d/%d\nCOMBO x%.1f %.1fs,货舱 %d/%d\n连击 x%.1f %.1f�
 m2.pause.title,PAUSED,已暂停
 m2.pause.resume,RESUME,继续
 m2.pause.return_hub,RETURN TO HUB,返回基地
+m3.pause.confirm_abandon,CONFIRM ABANDON,确认放弃下潜

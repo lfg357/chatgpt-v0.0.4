@@ -3,6 +3,7 @@ class_name M2Hud extends Control
 @export var rig_path: NodePath
 var rig: Node
 var controller: Node
+var abandon_armed := false
 @onready var hull: Label = $BottomFrame/VitalsPanel/Hull
 @onready var energy: Label = $BottomFrame/VitalsPanel/Energy
 @onready var heat: Label = $BottomFrame/HeatPanel/Heat
@@ -22,8 +23,8 @@ func _ready() -> void:
 	$PausePanel/PauseLabel.text = tr("m2.pause.title")
 	resume.text = tr("m2.pause.resume")
 	return_to_hub.text = tr("m2.pause.return_hub")
-	resume.pressed.connect(func(): if rig != null: rig.set_paused(false))
-	return_to_hub.pressed.connect(func(): if controller != null: controller.request_abandon())
+	resume.pressed.connect(_on_resume_pressed)
+	return_to_hub.pressed.connect(_on_abandon_pressed)
 	# Keep the prompt in sync immediately; later swaps arrive through its signal.
 	input_prompt.set_device_family(InputService.device_family)
 
@@ -41,6 +42,17 @@ func _process(_delta: float) -> void:
 		objective.text = (tr("m3.hud.objective") % [run.cargo_used, run.CARGO_CAPACITY, run.combo_multiplier(), run.combo_remaining]).replace("\\n", "\n")
 	else: objective.text = (tr("m2.hud.objective") % int(rig.global_position.y)).replace("\\n", "\n")
 	tool.text = tr("m2.hud.tool") % rig.tools.ammo
-	utility.text = tr("m2.hud.utility") % [rig.tools.sonar_cooldown, rig.tools.beacons.size()]
+	utility.text = tr("m2.hud.utility") % [rig.tools.sonar_cooldown, rig.tools.beacon_ammo]
 	extraction.text = tr("m2.hud.extract") % minf(100.0, rig.tools.recall_seconds / rig.tools.RECALL_SECONDS * 100.0)
 	pause_panel.visible = rig.paused
+
+func _on_abandon_pressed() -> void:
+	if controller == null: return
+	if not abandon_armed:
+		abandon_armed = true; return_to_hub.text = tr("m3.pause.confirm_abandon")
+		return
+	controller.request_abandon()
+
+func _on_resume_pressed() -> void:
+	abandon_armed = false; return_to_hub.text = tr("m2.pause.return_hub")
+	if rig != null: rig.set_paused(false)

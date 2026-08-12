@@ -4,6 +4,7 @@ signal domain_event(kind: StringName, data: Dictionary)
 enum RunPhase { ENTERING, ACTIVE, PAUSED, EXTRACTING, COMPLETED, FAILED, ABANDONED }
 const CargoEntryValue = preload("res://src/domain/cargo_entry.gd")
 const RunResultValue = preload("res://src/domain/run_result.gd")
+const RouteSampleValue = preload("res://src/domain/route_sample.gd")
 const COMBO_WINDOW := 2.5
 const CARGO_CAPACITY := 100
 const MINERALS := {
@@ -24,6 +25,8 @@ var combo_remaining := 0.0
 var damage_taken := 0
 var overheat_count := 0
 var emergency_collision_count := 0
+var route_samples: Array[Resource] = []
+var performance_summary: Dictionary = {}
 var discoveries: Array[StringName] = []
 var supply_claimed := false
 var boiler := BoilerState.new()
@@ -67,6 +70,14 @@ func tick(delta: float, paused: bool = false) -> void:
 	if combo_remaining == 0.0: reset_combo()
 	if boiler.tick(delta): damage(30, &"boiler_pulse")
 
+func record_route(position: Vector2, aim_angle: float, flags: int = 0) -> void:
+	var sample = RouteSampleValue.new()
+	sample.time_ms = roundi(elapsed * 1000.0)
+	sample.position = position
+	sample.aim_angle = aim_angle
+	sample.flags = flags
+	route_samples.append(sample)
+
 func collect(mineral_id: StringName, damaged: bool = false, near_live_cable: bool = false) -> bool:
 	if phase != RunPhase.ACTIVE or not MINERALS.has(mineral_id) or cargo_used >= CARGO_CAPACITY: return false
 	var value: Dictionary = MINERALS[mineral_id]
@@ -91,7 +102,7 @@ func damage(amount: int, source: StringName = &"") -> void:
 func claim_supply(run_state: Variant, tools: Variant) -> bool:
 	if supply_claimed: return false
 	supply_claimed = true; run_state.durability = minf(100.0, run_state.durability + 30.0); tools.ammo = mini(2, tools.ammo + 1)
-	if tools.beacons.size() >= tools.BEACON_LIMIT: return true
+	tools.restore_beacon()
 	return true
 func discover(id: StringName) -> void:
 	if not discoveries.has(id): discoveries.append(id); domain_event.emit(&"room_enter", {"discovery_id": id})
@@ -101,9 +112,9 @@ func finish(success: bool, reason: StringName = &""):
 	phase = RunPhase.COMPLETED if success else RunPhase.FAILED if reason == &"destroyed" else RunPhase.ABANDONED
 	var result = RunResultValue.new(); result.run_id = run_id; result.config = config; result.success = success; result.failure_reason = &"" if success else reason
 	result.duration_ms = roundi(elapsed * 1000.0); result.damage_taken = damage_taken; result.overheat_count = overheat_count; result.emergency_collision_count = emergency_collision_count
-	result.discovery_ids = discoveries.duplicate(); result.contract_progress = {}; result.performance_summary = {"cargo_used": cargo_used}; result.topology_hash = topology_hash
+	result.discovery_ids = discoveries.duplicate(); result.route_samples = route_samples.duplicate(); result.contract_progress = {}
+	result.performance_summary = performance_summary.duplicate(true); result.performance_summary["cargo_used"] = cargo_used; result.topology_hash = topology_hash
 	var ids := cargo.keys(); ids.sort()
 	for id in ids: result.cargo.append(cargo[id].duplicate_entry())
 	terminated_result = result; domain_event.emit(&"run_success" if success else &"run_failure" if reason == &"destroyed" else &"run_abandon", {})
 	return result
-

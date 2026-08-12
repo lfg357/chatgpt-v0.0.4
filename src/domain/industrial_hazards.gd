@@ -3,9 +3,13 @@ class_name IndustrialHazards extends RefCounted
 class SteamVent extends RefCounted:
 	enum State { IDLE, WARNING, FIRING }
 	var state := State.IDLE; var clock := 0.0; var hit_targets: Dictionary = {}
+	var cycle_seconds := 4.0
 	func tick(delta: float, paused := false) -> void:
 		if paused: return
-		clock = fmod(clock + delta, 4.0); state = State.WARNING if clock >= 1.5 and clock < 3.0 else State.FIRING if clock >= 3.0 else State.IDLE
+		clock = fmod(clock + delta, cycle_seconds)
+		var firing_start := cycle_seconds - 1.0
+		var warning_start := firing_start - 1.5
+		state = State.WARNING if clock >= warning_start and clock < firing_start else State.FIRING if clock >= firing_start else State.IDLE
 		if state != State.FIRING: hit_targets.clear()
 	func try_hit(target_id: int) -> int:
 		if state != State.FIRING or hit_targets.has(target_id): return 0
@@ -27,4 +31,3 @@ class CollapseShale extends RefCounted:
 		if state == State.WAITING: delay += delta; state = State.FALLING if delay >= 0.6 else State.WAITING
 		elif state == State.FALLING: velocity = minf(180.0, velocity + 360.0 * delta)
 	func land() -> void: state = State.LANDED; velocity = 0.0
-

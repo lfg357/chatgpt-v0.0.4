@@ -63,13 +63,18 @@ func test_abandon_discards_only_run_state() -> bool:
 	return true
 
 func test_supply_claim_once_and_clamps() -> bool:
-	var run = _run(); var m2 = M2State.new(); m2.durability = 80; var tools = Tools.new(); tools.ammo = 1
-	assert_true(run.claim_supply(m2, tools)); assert_equal(m2.durability, 100.0); assert_equal(tools.ammo, 2); assert_true(not run.claim_supply(m2, tools))
+	var run = _run(); var m2 = M2State.new(); m2.durability = 80; var tools = Tools.new(); tools.ammo = 1; tools.place_beacon(Vector2.ZERO)
+	assert_true(run.claim_supply(m2, tools)); assert_equal(m2.durability, 100.0); assert_equal(tools.ammo, 2); assert_equal(tools.beacon_ammo, 3); assert_true(not run.claim_supply(m2, tools))
 	return true
 
 func test_steam_warning_firing_and_single_hit() -> bool:
 	var steam = Hazards.SteamVent.new(); steam.tick(1.6); assert_equal(steam.state, steam.State.WARNING); steam.tick(1.5); assert_equal(steam.state, steam.State.FIRING)
 	assert_equal(steam.try_hit(1), 15); assert_equal(steam.try_hit(1), 0); steam.tick(1.0, true); assert_equal(steam.state, steam.State.FIRING)
+	return true
+
+func test_completed_boiler_valve_reduces_steam_frequency() -> bool:
+	var steam = Hazards.SteamVent.new(); steam.cycle_seconds = 6.0; steam.tick(3.1)
+	assert_equal(steam.state, steam.State.IDLE); steam.tick(0.5); assert_equal(steam.state, steam.State.WARNING)
 	return true
 
 func test_cable_half_second_damage_and_shutdown() -> bool:
@@ -86,8 +91,16 @@ func test_scrap_mite_state_steal_cap_retreat_and_ownership() -> bool:
 	var mite = Mite.new(); var available: Array[String] = ["a", "b", "c", "d"]
 	for _i in range(4): var stolen := mite.tick(2.0, available); if not stolen.is_empty(): available.erase(stolen)
 	assert_equal(mite.carried_ids.size(), 3); assert_equal(available.size(), 1)
-	mite.disturb(); mite.tick(5.9, []); assert_equal(mite.state, mite.State.RETREAT); mite.tick(.1, []); assert_equal(mite.state, mite.State.CALM)
+	mite.disturb(); assert_equal(mite.state, mite.State.DISTURBED); mite.tick(.2, []); assert_equal(mite.state, mite.State.RETREAT)
+	mite.tick(5.9, []); assert_equal(mite.state, mite.State.RETREAT); mite.tick(.1, []); assert_equal(mite.state, mite.State.CALM)
 	var released := mite.release_all(); assert_equal(released.size(), 3); assert_equal(mite.carried_ids.size(), 0)
+	return true
+
+func test_run_result_has_minimal_route_and_performance_data() -> bool:
+	var run = _run(); run.record_route(Vector2(12, 24), 0.5, 1); run.performance_summary = {"peak_update_ms": 2.0}
+	var result = run.finish(true)
+	assert_equal(result.route_samples.size(), 1); assert_equal(result.route_samples[0].position, Vector2(12, 24))
+	assert_equal(result.performance_summary.peak_update_ms, 2.0); assert_true(result.performance_summary.has("cargo_used"))
 	return true
 
 func test_boiler_timeout_retries_and_completion_stops_hazard() -> bool:

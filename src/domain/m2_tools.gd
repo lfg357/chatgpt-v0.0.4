@@ -12,6 +12,7 @@ var ammo := 2
 var sonar_seconds := 0.0
 var sonar_cooldown := 0.0
 var beacons: Array[Vector2] = []
+var beacon_ammo := BEACON_LIMIT
 var recall_seconds := 0.0
 
 func tick(delta: float, recalling: bool, paused: bool) -> bool:
@@ -47,6 +48,10 @@ func activate_sonar() -> bool:
 	if sonar_cooldown > 0.0: return false
 	sonar_seconds = SONAR_DURATION; sonar_cooldown = SONAR_COOLDOWN; return true
 
-func place_beacon(position: Vector2) -> void:
-	if beacons.size() >= BEACON_LIMIT: beacons.pop_front()
-	beacons.append(position)
+func place_beacon(position: Vector2) -> bool:
+	if beacon_ammo <= 0: return false
+	beacons.append(position); beacon_ammo -= 1; return true
+
+func restore_beacon() -> bool:
+	if beacon_ammo >= BEACON_LIMIT: return false
+	beacon_ammo += 1; return true
