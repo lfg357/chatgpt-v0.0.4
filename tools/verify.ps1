@@ -67,7 +67,10 @@ if ($Quick) {
     & powershell -ExecutionPolicy Bypass -File tools\m3_seed_validation.ps1 -GodotBin $GodotBin
 }
 if ($LASTEXITCODE -ne 0) { throw 'M3 deterministic seed gate failed.' }
-Write-Host '13/13 M2 human acceptance gate'
+Write-Host '13/14 M3 cross-process and cold-snapshot hash gate'
+& powershell -ExecutionPolicy Bypass -File tools\m3_cross_process_gate.ps1 -GodotBin $GodotBin
+if ($LASTEXITCODE -ne 0) { throw 'M3 cross-process hash gate failed.' }
+Write-Host '14/14 M2 human acceptance gate'
 & powershell -ExecutionPolicy Bypass -File tools\m2_acceptance_gate.ps1
 if ($LASTEXITCODE -ne 0) { throw 'M2 human acceptance gate failed.' }
 Write-Host 'Verification passed.'
