@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource path="res://scenes/dive/dive.gd" type="Script" id="1_dive"]
 [ext_resource path="res://src/gameplay/terrain_world.gd" type="Script" id="2_terrain"]
 [ext_resource path="res://src/gameplay/drill_rig.gd" type="Script" id="3_rig"]
 [ext_resource path="res://src/gameplay/m2_camera.gd" type="Script" id="4_camera"]
+[ext_resource path="res://src/ui/m2_hud.gd" type="Script" id="5_hud"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rig"]
 radius = 6.0
@@ -54,13 +55,72 @@ position_smoothing_enabled = true
 script = ExtResource("4_camera")
 map_bounds = Rect2(64, 86, 512, 208)
 
-[node name="Status" type="Label" parent="."]
-layout_mode = 0
-offset_left = 64.0
-offset_top = 302.0
-offset_right = 576.0
-offset_bottom = 324.0
+[node name="M2Hud" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("5_hud")
+rig_path = NodePath("../DrillRig")
+
+[node name="Hull" type="Label" parent="M2Hud"]
+offset_left = 12.0
+offset_top = 12.0
+theme_override_font_sizes/font_size = 13
+
+[node name="Energy" type="Label" parent="M2Hud"]
+offset_left = 12.0
+offset_top = 30.0
+theme_override_font_sizes/font_size = 13
+
+[node name="Heat" type="Label" parent="M2Hud"]
+offset_left = 250.0
+offset_top = 12.0
+theme_override_font_sizes/font_size = 13
+
+[node name="Objective" type="Label" parent="M2Hud"]
+offset_left = 510.0
+offset_top = 12.0
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 2
+
+[node name="Tool" type="Label" parent="M2Hud"]
+offset_left = 12.0
+offset_top = 326.0
+theme_override_font_sizes/font_size = 12
+
+[node name="Utility" type="Label" parent="M2Hud"]
+offset_left = 250.0
+offset_top = 326.0
+theme_override_font_sizes/font_size = 12
+
+[node name="Extraction" type="Label" parent="M2Hud"]
+offset_left = 455.0
+offset_top = 326.0
+theme_override_font_sizes/font_size = 12
+
+[node name="PausePanel" type="Panel" parent="M2Hud"]
+offset_left = 222.0
+offset_top = 142.0
+offset_right = 418.0
+offset_bottom = 218.0
+mouse_filter = 0
+
+[node name="PauseLabel" type="Label" parent="M2Hud/PausePanel"]
+offset_left = 34.0
+offset_top = 12.0
+offset_right = 162.0
+offset_bottom = 32.0
+text = "PAUSED"
 horizontal_alignment = 1
+
+[node name="Resume" type="Button" parent="M2Hud/PausePanel"]
+offset_left = 36.0
+offset_top = 38.0
+offset_right = 160.0
+offset_bottom = 66.0
+text = "RESUME"
 
 [node name="BackToHub" type="Button" parent="."]
 layout_mode = 0

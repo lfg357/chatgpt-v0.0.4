@@ -6,7 +6,6 @@ const AppStateDefinition = preload("res://src/core/app_state.gd")
 @onready var drill_rig = $DrillRig
 @onready var title: Label = $Title
 @onready var instruction: Label = $Instruction
-@onready var status: Label = $Status
 @onready var back_to_hub: Button = $BackToHub
 
 func _ready() -> void:
@@ -14,10 +13,6 @@ func _ready() -> void:
 	instruction.text = tr("dive.sandbox.instruction")
 	back_to_hub.text = tr("dive.sandbox.back")
 	back_to_hub.pressed.connect(func(): SceneRouter.go_to(AppStateDefinition.AppMode.HUB))
-	_update_status()
-
-func _process(_delta: float) -> void:
-	_update_status()
 
 func _input(event: InputEvent) -> void:
 	if not event is InputEventMouseButton or not event.pressed:
@@ -34,9 +29,3 @@ func _input(event: InputEvent) -> void:
 	else:
 		terrain_world.request_explosion(cell, 3)
 	get_viewport().set_input_as_handled()
-	_update_status()
-
-func _update_status() -> void:
-	var terrain: Variant = terrain_world.terrain
-	var state = drill_rig.state
-	status.text = "Hull %03d  Energy %03d  Heat %03d  %s  Pins %d  Sonar %.1f" % [state.durability, state.energy, state.heat, "PAUSED" if drill_rig.paused else "ACTIVE", drill_rig.tools.blast_pins.size(), drill_rig.tools.sonar_seconds]

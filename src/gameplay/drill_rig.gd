@@ -12,10 +12,14 @@ var paused := false
 func _ready() -> void:
 	terrain = get_node_or_null(terrain_path)
 
+func set_paused(value: bool) -> void:
+	paused = value
+	if not paused: InputService.clear_after_focus_loss()
+
 func _physics_process(delta: float) -> void:
 	var mouse_aim := get_global_mouse_position() - global_position
 	var frame = InputService.frame_from_actions(mouse_aim, Engine.get_physics_frames())
-	if frame.has_pressed(64): paused = not paused
+	if frame.has_pressed(64): set_paused(not paused)
 	var result := state.tick(delta, frame, paused)
 	if paused: velocity = Vector2.ZERO; return
 	var desired: Vector2 = frame.move.normalized() * RunState.MAX_SPEED * float(result.move_scale)
@@ -52,5 +56,5 @@ func _cell_at(point: Vector2) -> Vector2i:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
-		paused = true
+		set_paused(true)
 		InputService.clear_after_focus_loss()
