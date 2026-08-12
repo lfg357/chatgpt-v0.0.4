@@ -17,13 +17,10 @@ $requiredSnapshotPaths = @(
 )
 
 try {
-    # QA invokes this script both from a Git checkout and from a previously
-    # extracted git archive.  The latter deliberately has no .git directory;
-    # it is already the cache-free snapshot and must not try to archive again.
-    $previousPreference = $ErrorActionPreference
-    $ErrorActionPreference = 'Continue'
-    try { $isGitCheckout = ((& git -C $workspace rev-parse --is-inside-work-tree 2>$null) -eq 'true') }
-    finally { $ErrorActionPreference = $previousPreference }
+    # A QA snapshot can live beneath this repository.  Do not use Git ancestor
+    # discovery here: it would incorrectly treat that extracted snapshot as the
+    # parent checkout. Only a .git entry at this project root is a checkout.
+    $isGitCheckout = Test-Path -LiteralPath (Join-Path $workspace '.git')
     if ($isGitCheckout) {
         $scratch = Join-Path ([System.IO.Path]::GetTempPath()) ("m2-cold-import-" + [guid]::NewGuid().ToString('N'))
         $archive = Join-Path $scratch 'snapshot.zip'
