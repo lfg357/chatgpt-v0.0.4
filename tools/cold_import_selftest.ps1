@@ -6,9 +6,8 @@ if (-not (Test-Path -LiteralPath $GodotBin)) { throw "Godot binary not found: $G
 
 $scriptRoot = Split-Path -Parent $PSCommandPath
 $workspace = (Resolve-Path (Join-Path $scriptRoot '..')).Path
-$scratch = Join-Path ([System.IO.Path]::GetTempPath()) ("m2-cold-import-" + [guid]::NewGuid().ToString('N'))
-$archive = Join-Path $scratch 'snapshot.zip'
-$snapshot = Join-Path $scratch 'project'
+$scratch = $null
+$snapshot = $workspace
 $requiredSnapshotPaths = @(
     'project.godot',
     'tests/test_runner.gd',
@@ -18,10 +17,19 @@ $requiredSnapshotPaths = @(
 )
 
 try {
-    New-Item -ItemType Directory -Path $scratch | Out-Null
-    & git -C $workspace archive --format=zip --output=$archive HEAD
-    if ($LASTEXITCODE -ne 0) { throw 'Unable to create a tracked-file snapshot for cold import.' }
-    Expand-Archive -LiteralPath $archive -DestinationPath $snapshot -Force
+    # QA invokes this script both from a Git checkout and from a previously
+    # extracted git archive.  The latter deliberately has no .git directory;
+    # it is already the cache-free snapshot and must not try to archive again.
+    & git -C $workspace rev-parse --is-inside-work-tree 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        $scratch = Join-Path ([System.IO.Path]::GetTempPath()) ("m2-cold-import-" + [guid]::NewGuid().ToString('N'))
+        $archive = Join-Path $scratch 'snapshot.zip'
+        $snapshot = Join-Path $scratch 'project'
+        New-Item -ItemType Directory -Path $scratch | Out-Null
+        & git -C $workspace archive --format=zip --output=$archive HEAD
+        if ($LASTEXITCODE -ne 0) { throw 'Unable to create a tracked-file snapshot for cold import.' }
+        Expand-Archive -LiteralPath $archive -DestinationPath $snapshot -Force
+    }
     foreach ($relativePath in $requiredSnapshotPaths) {
         $snapshotPath = Join-Path $snapshot $relativePath
         if (-not (Test-Path -LiteralPath $snapshotPath)) {
@@ -47,5 +55,5 @@ try {
     Write-Host 'Cold snapshot tests and import passed.'
 }
 finally {
-    if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Recurse -Force }
+    if ($null -ne $scratch -and (Test-Path -LiteralPath $scratch)) { Remove-Item -LiteralPath $scratch -Recurse -Force }
 }
