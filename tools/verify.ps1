@@ -6,6 +6,10 @@ $ErrorActionPreference = 'Stop'
 if ([string]::IsNullOrWhiteSpace($GodotBin)) { $GodotBin = 'C:\Users\AdminLFG\AppData\Local\Programs\Godot\Godot_v4.7-stable_win64_console.exe' }
 if (-not (Test-Path -LiteralPath $GodotBin)) { throw "Godot binary not found: $GodotBin" }
 
+$scriptRoot = Split-Path -Parent $PSCommandPath
+$workspace = (Resolve-Path (Join-Path $scriptRoot '..')).Path
+Set-Location -LiteralPath $workspace
+
 function Invoke-GodotChecked([string[]]$GodotArgs, [bool]$ExpectSuccess = $true) {
     $previousPreference = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
@@ -22,7 +26,7 @@ function Invoke-GodotChecked([string[]]$GodotArgs, [bool]$ExpectSuccess = $true)
 }
 
 Write-Host '1/10 clean-snapshot import, test and resource parse gate'
-& powershell -ExecutionPolicy Bypass -File tools\cold_import_selftest.ps1 -GodotBin $GodotBin
+& powershell -ExecutionPolicy Bypass -File (Join-Path $scriptRoot 'cold_import_selftest.ps1') -GodotBin $GodotBin
 if ($LASTEXITCODE -ne 0) { throw 'Cold snapshot import gate failed.' }
 Write-Host '2/10 cache-free test suite (run this first in a clean snapshot)'
 Invoke-GodotChecked @('--script', 'res://tests/test_runner.gd')

@@ -4,16 +4,30 @@ $ErrorActionPreference = 'Stop'
 if ([string]::IsNullOrWhiteSpace($GodotBin)) { $GodotBin = 'C:\Users\AdminLFG\AppData\Local\Programs\Godot\Godot_v4.7-stable_win64_console.exe' }
 if (-not (Test-Path -LiteralPath $GodotBin)) { throw "Godot binary not found: $GodotBin" }
 
-$workspace = (Resolve-Path '.').Path
+$scriptRoot = Split-Path -Parent $PSCommandPath
+$workspace = (Resolve-Path (Join-Path $scriptRoot '..')).Path
 $scratch = Join-Path ([System.IO.Path]::GetTempPath()) ("m2-cold-import-" + [guid]::NewGuid().ToString('N'))
 $archive = Join-Path $scratch 'snapshot.zip'
 $snapshot = Join-Path $scratch 'project'
+$requiredSnapshotPaths = @(
+    'project.godot',
+    'tests/test_runner.gd',
+    'tests/unit/test_terrain.gd',
+    'tests/unit/test_terrain_world.gd',
+    'tools/terrain_endurance.gd'
+)
 
 try {
     New-Item -ItemType Directory -Path $scratch | Out-Null
     & git -C $workspace archive --format=zip --output=$archive HEAD
     if ($LASTEXITCODE -ne 0) { throw 'Unable to create a tracked-file snapshot for cold import.' }
     Expand-Archive -LiteralPath $archive -DestinationPath $snapshot -Force
+    foreach ($relativePath in $requiredSnapshotPaths) {
+        $snapshotPath = Join-Path $snapshot $relativePath
+        if (-not (Test-Path -LiteralPath $snapshotPath)) {
+            throw "Cold snapshot archive is missing required tracked path: $relativePath"
+        }
+    }
     $previousPreference = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
     try { $importOutput = @(& $GodotBin --headless --editor --path $snapshot --quit-after 120 2>&1) }
