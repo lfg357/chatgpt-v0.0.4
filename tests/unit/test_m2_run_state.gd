@@ -35,3 +35,10 @@ func test_resume_suppresses_residual_mouse_actions() -> bool:
 	var frame=InputService.frame_from_actions(Vector2.RIGHT, 99)
 	assert_equal(frame.held, 0)
 	return true
+func test_recall_requires_continuous_hold() -> bool:
+	var tools=Tools.new()
+	assert_true(not tools.tick(1.0, true, false))
+	assert_true(not tools.tick(0.1, false, false))
+	assert_true(not tools.tick(1.0, true, false))
+	assert_true(tools.tick(0.6, true, false))
+	return true

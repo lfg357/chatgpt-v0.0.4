@@ -10,6 +10,7 @@ func test_dive_scene_exposes_terrain_validation_sandbox() -> bool:
 	assert_true(dive.has_node("M2Hud"))
 	assert_true(dive.has_node("M2Hud/PausePanel/Resume"))
 	assert_true(dive.has_node("M2Hud/PausePanel/ReturnToHub"))
+	assert_true(dive.has_node("M2Feedback"))
 	assert_true(not dive.get_node("Title").visible, "dive title must not overlap the top HUD")
 	assert_true(dive.get_node("Instruction").position.y >= 60.0, "instruction reserves the top HUD safety area")
 	var panel: Panel = dive.get_node("M2Hud/PausePanel")

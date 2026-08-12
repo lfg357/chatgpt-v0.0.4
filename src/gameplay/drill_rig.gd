@@ -38,7 +38,9 @@ func _physics_process(delta: float) -> void:
 			if tools.detonate(terrain) > 0 and has_node("M2Camera"): $M2Camera.add_trauma(0.35)
 	if frame.has_pressed(8): tools.activate_sonar()
 	if frame.has_pressed(16): tools.place_beacon(global_position)
-	tools.tick(delta, frame.has_held(32), paused)
+	if tools.tick(delta, frame.has_held(32), paused):
+		SceneRouter.go_to(4)
+		return
 	if has_node("M2Camera"):
 		$M2Camera.update_target(global_position, state.last_aim, velocity, delta)
 	_update_sprite(bool(result.drilling))

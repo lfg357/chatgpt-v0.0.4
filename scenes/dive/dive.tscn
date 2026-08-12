@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource path="res://scenes/dive/dive.gd" type="Script" id="1_dive"]
 [ext_resource path="res://src/gameplay/terrain_world.gd" type="Script" id="2_terrain"]
@@ -6,6 +6,7 @@
 [ext_resource path="res://src/gameplay/m2_camera.gd" type="Script" id="4_camera"]
 [ext_resource path="res://src/ui/m2_hud.gd" type="Script" id="5_hud"]
 [ext_resource path="res://assets/sprites/drill_default.tres" type="SpriteFrames" id="6_drill_frames"]
+[ext_resource path="res://src/gameplay/m2_feedback.gd" type="Script" id="7_feedback"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rig"]
 radius = 6.0
@@ -64,6 +65,10 @@ scale = Vector2(0.5, 0.5)
 position_smoothing_enabled = true
 script = ExtResource("4_camera")
 map_bounds = Rect2(64, 86, 512, 208)
+
+[node name="M2Feedback" type="Node2D" parent="."]
+script = ExtResource("7_feedback")
+rig_path = NodePath("../DrillRig")
 
 [node name="M2Hud" type="Control" parent="."]
 layout_mode = 3
