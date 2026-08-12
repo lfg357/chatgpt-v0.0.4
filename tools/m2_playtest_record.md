@@ -4,7 +4,7 @@
 
 ## 封板签字
 
-> 本记录的汇总结论由项目验收方确认；为保护试玩者隐私，不记录姓名或原始评分明细。
+> 本记录按隐私汇总方式记录：实机验收结论由 `lfg` 确认；为保护试玩者隐私，不记录姓名或原始评分明细。
 
 ```text
 M2_ACCEPTANCE_STATUS=ACCEPTED
@@ -18,7 +18,7 @@ M2_AVERAGE_DRILL_FEEL_AT_LEAST=4.0
 M2_SECOND_DIVE_SESSIONS_AT_LEAST=3
 M2_BLOCKING_DEFECTS=0
 M2_DUAL_INPUT_10_MINUTE_RUNS=PASS
-M2_ACCEPTED_BY=project_acceptance
+M2_ACCEPTED_BY=lfg
 ```
 
 ## 通过结论
