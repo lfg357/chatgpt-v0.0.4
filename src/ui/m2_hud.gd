@@ -10,6 +10,7 @@ var rig: Node
 @onready var tool: Label = $BottomFrame/ToolsPanel/Tool
 @onready var utility: Label = $BottomFrame/UtilityPanel/Utility
 @onready var extraction: Label = $BottomFrame/ExtractionPanel/Extraction
+@onready var input_prompt: Control = $InputPrompt
 @onready var pause_panel: Panel = $PausePanel
 @onready var resume: Button = $PausePanel/Resume
 @onready var return_to_hub: Button = $PausePanel/ReturnToHub
@@ -21,6 +22,8 @@ func _ready() -> void:
 	return_to_hub.text = tr("m2.pause.return_hub")
 	resume.pressed.connect(func(): if rig != null: rig.set_paused(false))
 	return_to_hub.pressed.connect(func(): SceneRouter.go_to(3))
+	# Keep the prompt in sync immediately; later swaps arrive through its signal.
+	input_prompt.set_device_family(InputService.device_family)
 
 func _process(_delta: float) -> void:
 	if rig == null: return

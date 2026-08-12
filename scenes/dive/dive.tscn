@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource path="res://scenes/dive/dive.gd" type="Script" id="1_dive"]
 [ext_resource path="res://src/gameplay/terrain_world.gd" type="Script" id="2_terrain"]
@@ -7,6 +7,7 @@
 [ext_resource path="res://src/ui/m2_hud.gd" type="Script" id="5_hud"]
 [ext_resource path="res://assets/sprites/drill_default.tres" type="SpriteFrames" id="6_drill_frames"]
 [ext_resource path="res://src/gameplay/m2_feedback.gd" type="Script" id="7_feedback"]
+[ext_resource path="res://src/ui/input_prompt.gd" type="Script" id="8_input_prompt"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rig"]
 radius = 6.0
@@ -105,6 +106,14 @@ anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("5_hud")
 rig_path = NodePath("../../DrillRig")
+
+[node name="InputPrompt" type="Control" parent="HudLayer/M2Hud"]
+offset_left = 126.0
+offset_top = 8.0
+offset_right = 514.0
+offset_bottom = 30.0
+mouse_filter = 2
+script = ExtResource("8_input_prompt")
 
 [node name="BottomFrame" type="Panel" parent="HudLayer/M2Hud"]
 offset_left = 10.0

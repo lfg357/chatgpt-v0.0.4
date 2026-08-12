@@ -13,6 +13,7 @@ func test_dive_scene_exposes_terrain_validation_sandbox() -> bool:
 	assert_true(dive.has_node("HudLayer/M2Hud/BottomFrame/VitalsPanel"))
 	assert_true(dive.has_node("HudLayer/M2Hud/BottomFrame/HeatPanel/HeatFill"))
 	assert_true(dive.has_node("HudLayer/M2Hud/BottomFrame/ExtractionPanel"))
+	assert_true(dive.has_node("HudLayer/M2Hud/InputPrompt"), "HUD must expose a visible device-specific input prompt")
 	assert_true(dive.has_node("M2Feedback"))
 	assert_true(dive.get_node("HudLayer") is CanvasLayer, "HUD must remain fixed to the viewport")
 	assert_equal(dive.mouse_filter, Control.MOUSE_FILTER_IGNORE, "world-sized root UI must not swallow drill clicks")
@@ -21,6 +22,17 @@ func test_dive_scene_exposes_terrain_validation_sandbox() -> bool:
 	var return_button: Button = dive.get_node("HudLayer/M2Hud/PausePanel/ReturnToHub")
 	assert_true(return_button.position.y + return_button.size.y <= panel.size.y, "pause panel wraps all buttons")
 	dive.free()
+	return true
+
+func test_hud_input_prompt_switches_with_input_service() -> bool:
+	var dive := DiveScene.instantiate()
+	runner_tree.root.add_child(dive)
+	var prompt = dive.get_node("HudLayer/M2Hud/InputPrompt")
+	InputService.note_gamepad_input()
+	assert_equal(prompt.device_family, &"gamepad")
+	InputService.note_keyboard_mouse_input()
+	assert_equal(prompt.device_family, &"keyboard_mouse")
+	dive.queue_free()
 	return true
 
 func test_dive_scene_routes_controls_to_the_rig() -> bool:
