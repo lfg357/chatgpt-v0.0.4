@@ -58,11 +58,13 @@ Write-Host '10/11 M2 control endurance'
 $m2Args = @('--script', 'res://tools/m2_endurance.gd')
 if ($Quick) { $m2Args += @('--', '--quick') }
 Invoke-GodotChecked -GodotArgs $m2Args
-Write-Host '11/12 M3 deterministic seed gate'
+Write-Host '11/13 M3 production dive endurance'
+Invoke-GodotChecked @('--script', 'res://tools/m3_endurance.gd')
+Write-Host '12/13 M3 deterministic seed gate'
 $m3Args = @('--script', 'res://tools/m3_seed_validation.gd')
 if ($Quick) { $m3Args += @('--', '--quick') }
 Invoke-GodotChecked -GodotArgs $m3Args
-Write-Host '12/12 M2 human acceptance gate'
+Write-Host '13/13 M2 human acceptance gate'
 & powershell -ExecutionPolicy Bypass -File tools\m2_acceptance_gate.ps1
 if ($LASTEXITCODE -ne 0) { throw 'M2 human acceptance gate failed.' }
 Write-Host 'Verification passed.'
