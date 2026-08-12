@@ -12,28 +12,15 @@
 radius = 6.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxHud"]
-bg_color = Color(0.035, 0.07, 0.105, 0.94)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.2, 0.58, 0.62, 0.8)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+bg_color = Color(0.12, 0.17, 0.24, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.72, 0.79, 0.80, 0.95)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxHeat"]
-bg_color = Color(0.055, 0.09, 0.13, 0.96)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.88, 0.42, 0.32, 0.75)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+bg_color = Color(0.07, 0.10, 0.15, 0.8)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxPause"]
 bg_color = Color(0.025, 0.045, 0.07, 0.96)
@@ -54,6 +41,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_dive")
 
 [node name="Title" type="Label" parent="."]
@@ -64,6 +52,7 @@ offset_right = 576.0
 offset_bottom = 50.0
 theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
+mouse_filter = 2
 visible = false
 
 [node name="TerrainWorld" type="Node2D" parent="."]
@@ -105,6 +94,7 @@ offset_bottom = 24.0
 theme_override_colors/font_color = Color(0.58, 0.78, 0.8, 0.95)
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
+mouse_filter = 2
 visible = false
 
 [node name="M2Hud" type="Control" parent="HudLayer"]
@@ -117,18 +107,17 @@ script = ExtResource("5_hud")
 rig_path = NodePath("../../DrillRig")
 
 [node name="BottomFrame" type="Panel" parent="HudLayer/M2Hud"]
-offset_left = 8.0
-offset_top = 300.0
-offset_right = 632.0
+offset_left = 10.0
+offset_top = 302.0
+offset_right = 630.0
 offset_bottom = 354.0
 theme_override_styles/panel = SubResource("StyleBoxHud")
 
 [node name="VitalsPanel" type="Panel" parent="HudLayer/M2Hud/BottomFrame"]
 offset_left = 8.0
 offset_top = 6.0
-offset_right = 112.0
+offset_right = 118.0
 offset_bottom = 48.0
-theme_override_styles/panel = SubResource("StyleBoxHud")
 
 [node name="Hull" type="Label" parent="HudLayer/M2Hud/BottomFrame/VitalsPanel"]
 offset_left = 7.0
@@ -147,9 +136,9 @@ theme_override_colors/font_color = Color(0.38, 0.9, 0.76, 1)
 theme_override_font_sizes/font_size = 10
 
 [node name="HeatPanel" type="Panel" parent="HudLayer/M2Hud/BottomFrame"]
-offset_left = 116.0
+offset_left = 122.0
 offset_top = 6.0
-offset_right = 244.0
+offset_right = 252.0
 offset_bottom = 48.0
 theme_override_styles/panel = SubResource("StyleBoxHeat")
 
@@ -179,11 +168,10 @@ color = Color(0.286, 0.765, 0.694, 1)
 mouse_filter = 2
 
 [node name="ObjectivePanel" type="Panel" parent="HudLayer/M2Hud/BottomFrame"]
-offset_left = 248.0
+offset_left = 258.0
 offset_top = 6.0
-offset_right = 344.0
+offset_right = 356.0
 offset_bottom = 48.0
-theme_override_styles/panel = SubResource("StyleBoxHud")
 
 [node name="Objective" type="Label" parent="HudLayer/M2Hud/BottomFrame/ObjectivePanel"]
 offset_left = 5.0
@@ -195,11 +183,10 @@ theme_override_font_sizes/font_size = 9
 horizontal_alignment = 1
 
 [node name="ToolsPanel" type="Panel" parent="HudLayer/M2Hud/BottomFrame"]
-offset_left = 348.0
+offset_left = 362.0
 offset_top = 6.0
-offset_right = 432.0
+offset_right = 452.0
 offset_bottom = 48.0
-theme_override_styles/panel = SubResource("StyleBoxHud")
 
 [node name="Tool" type="Label" parent="HudLayer/M2Hud/BottomFrame/ToolsPanel"]
 offset_left = 4.0
@@ -211,11 +198,10 @@ theme_override_font_sizes/font_size = 9
 horizontal_alignment = 1
 
 [node name="UtilityPanel" type="Panel" parent="HudLayer/M2Hud/BottomFrame"]
-offset_left = 436.0
+offset_left = 458.0
 offset_top = 6.0
-offset_right = 532.0
+offset_right = 548.0
 offset_bottom = 48.0
-theme_override_styles/panel = SubResource("StyleBoxHud")
 
 [node name="Utility" type="Label" parent="HudLayer/M2Hud/BottomFrame/UtilityPanel"]
 offset_left = 4.0
@@ -227,11 +213,10 @@ theme_override_font_sizes/font_size = 8
 horizontal_alignment = 1
 
 [node name="ExtractionPanel" type="Panel" parent="HudLayer/M2Hud/BottomFrame"]
-offset_left = 536.0
+offset_left = 554.0
 offset_top = 6.0
-offset_right = 616.0
+offset_right = 608.0
 offset_bottom = 48.0
-theme_override_styles/panel = SubResource("StyleBoxHud")
 
 [node name="Extraction" type="Label" parent="HudLayer/M2Hud/BottomFrame/ExtractionPanel"]
 offset_left = 3.0

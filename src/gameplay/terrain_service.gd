@@ -3,10 +3,12 @@ class_name TerrainService extends RefCounted
 const CHUNK_SIZE := 32
 const MAX_EXPLOSION_CELLS := 128
 const MAX_COLLISION_REBUILDS_PER_TICK := 2
+const TILE_DURABILITY := 18
 var width: int
 var height: int
 var cells: PackedByteArray
-var pending_damage: Dictionary[Vector2i, bool] = {}
+var pending_damage: Dictionary[Vector2i, int] = {}
+var accumulated_damage: Dictionary[Vector2i, int] = {}
 var dirty_chunks: Dictionary[Vector2i, bool] = {}
 var collision_chunks: Dictionary[Vector2i, Dictionary] = {}
 var rebuilt_this_tick: int = 0
@@ -22,9 +24,9 @@ func set_initial_empty(cell: Vector2i) -> bool:
 	dirty_chunks[_chunk_for(cell)] = true
 	return true
 
-func request_damage(cell: Vector2i, _amount: int = 1) -> bool:
+func request_damage(cell: Vector2i, amount: int = TILE_DURABILITY) -> bool:
 	if not _in_bounds(cell) or not is_solid(cell): return false
-	pending_damage[cell] = true
+	pending_damage[cell] = int(pending_damage.get(cell, 0)) + maxi(1, amount)
 	return true
 
 func request_explosion(center: Vector2i, radius: int) -> int:
@@ -46,11 +48,20 @@ func commit_damage() -> int:
 	var changed := 0
 	for cell in pending_damage:
 		if is_solid(cell):
+			var total := int(accumulated_damage.get(cell, 0)) + int(pending_damage[cell])
+			if total < TILE_DURABILITY:
+				accumulated_damage[cell] = total
+				continue
 			cells[_index(cell)] = 0
+			accumulated_damage.erase(cell)
 			dirty_chunks[_chunk_for(cell)] = true
 			changed += 1
 	pending_damage.clear()
 	return changed
+
+func damage_ratio(cell: Vector2i) -> float:
+	if not is_solid(cell): return 0.0
+	return clampf(float(accumulated_damage.get(cell, 0)) / float(TILE_DURABILITY), 0.0, 1.0)
 
 func physics_tick() -> int:
 	rebuilt_this_tick = 0

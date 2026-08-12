@@ -2,6 +2,18 @@ keys,en,zh_CN
 menu.title,Time Strata Drill Bureau,时层钻探局
 profile.title,Select Profile,选择档案
 hub.title,Hub: Archive Station,基地：档案站
+menu.kicker,TIME STRATA OPERATIONS / SECURE BOOT,时层作业系统 / 安全启动
+menu.subtitle,Descend through buried industrial eras. Read the strata. Recover what time left behind.,下潜至被掩埋的工业时代。辨认地层，回收时间遗留之物。
+menu.continue,ENTER OPERATIONS,进入作业系统
+menu.status,ARCHIVE LINK READY,档案链路就绪
+profile.kicker,OPERATOR RECORD / LOCAL ARCHIVE,操作员记录 / 本地档案
+profile.subtitle,One field record is available. Progress and accessibility settings remain bound to this archive.,检测到一份现场档案。进度与辅助设置将绑定至该档案。
+profile.continue,OPEN FIELD RECORD 01,打开现场档案 01
+profile.status,INTEGRITY 100%,完整度 100%
+hub.kicker,SUBLEVEL 01 / INDUSTRIAL STRATUM,地下层 01 / 工业地层
+hub.subtitle,Drill rig serviced. Thermal loop nominal. The first exposed vein is marked for a controlled descent.,钻机维护完成，热循环正常。首条裸露矿脉已标记，可执行受控下潜。
+hub.continue,BEGIN INDUSTRIAL DIVE,开始工业层下潜
+hub.status,RIG READY  •  CLEARANCE M2,钻机就绪  •  权限 M2
 dive.title,Dive: Technical Validation,下潜：技术验证
 dive.sandbox.instruction,LMB drill · RMB tool · Q sonar · E beacon · Hold F extract,左键钻探 · 右键工具 · Q 声呐 · E 信标 · 长按 F 撤离
 dive.sandbox.status,Queued: %d | Dirty chunks: %d | Collision rebuilds: %d,待提交：%d｜脏分块：%d｜碰撞重建：%d

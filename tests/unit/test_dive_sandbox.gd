@@ -15,6 +15,7 @@ func test_dive_scene_exposes_terrain_validation_sandbox() -> bool:
 	assert_true(dive.has_node("HudLayer/M2Hud/BottomFrame/ExtractionPanel"))
 	assert_true(dive.has_node("M2Feedback"))
 	assert_true(dive.get_node("HudLayer") is CanvasLayer, "HUD must remain fixed to the viewport")
+	assert_equal(dive.mouse_filter, Control.MOUSE_FILTER_IGNORE, "world-sized root UI must not swallow drill clicks")
 	assert_true(not dive.get_node("Title").visible, "dive title must not overlap the top HUD")
 	var panel: Panel = dive.get_node("HudLayer/M2Hud/PausePanel")
 	var return_button: Button = dive.get_node("HudLayer/M2Hud/PausePanel/ReturnToHub")
@@ -57,7 +58,9 @@ func test_drill_breaks_the_first_solid_cell_at_the_visible_tip() -> bool:
 	var target := Vector2i(31, 20)
 	assert_true(terrain.terrain.is_solid(target))
 	assert_true(rig._request_drill(Vector2.RIGHT) > 0, "drilling at a touching wall must queue damage")
-	terrain.terrain.commit_damage()
+	for _tick in range(terrain.terrain.TILE_DURABILITY):
+		rig._request_drill(Vector2.RIGHT)
+		terrain.terrain.commit_damage()
 	assert_true(not terrain.terrain.is_solid(target), "the first contacted wall cell must be removed")
 	dive.queue_free()
 	return true

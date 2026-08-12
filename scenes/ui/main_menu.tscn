@@ -11,10 +11,10 @@ script = ExtResource("1")
 title_key = "menu.title"
 next_mode = 2
 [node name="Panel" type="VBoxContainer" parent="."]
-offset_left = 220.0
-offset_top = 100.0
-offset_right = 420.0
-offset_bottom = 260.0
+offset_left = 116.0
+offset_top = 76.0
+offset_right = 524.0
+offset_bottom = 294.0
 [node name="Title" type="Label" parent="Panel"]
 horizontal_alignment = 1
 [node name="Continue" type="Button" parent="Panel"]

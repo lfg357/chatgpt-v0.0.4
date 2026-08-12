@@ -11,11 +11,14 @@ var terrain: Node
 var paused := false
 var _was_colliding := false
 var _drill_feedback_cooldown := 0.0
+var drill_contact_active := false
+var drill_contact_point := Vector2.ZERO
 
 const DRILL_CONTACT_REACH := 7.0
 const DRILL_MAX_REACH := 26.0
 const DRILL_SAMPLE_STEP := 4.0
-const DRILL_CELLS_PER_TICK := 4
+const DRILL_DAMAGE_PER_TICK := 1
+const DRILL_BITE_SPEED := 34.0
 
 func _ready() -> void:
 	terrain = get_node_or_null(terrain_path)
@@ -44,6 +47,8 @@ func _physics_process(delta: float) -> void:
 	var is_colliding := get_slide_collision_count() > 0
 	if _consume_collision_impact(is_colliding, impact_speed):
 		_add_camera_trauma(0.2)
+	drill_contact_active = false
+	_set_feedback_contact(global_position, state.last_aim, false)
 	if result.drilling: _request_drill(state.last_aim)
 	if frame.has_pressed(2):
 		var cell := _cell_at(global_position + state.last_aim * 18.0)
@@ -68,8 +73,11 @@ func _update_sprite(drilling: bool) -> void:
 	elif drilling: wanted = &"drill"
 	elif velocity.length() > 5.0: wanted = &"thrust"
 	if sprite.animation != wanted: sprite.play(wanted)
-	# The chassis obeys gravity and stays upright. Aim is shown independently by M2Feedback.
-	sprite.rotation = 0.0
+	# The whole rig pitches toward the active drill axis. Rotation is clamped so
+	# the chassis remains readable while movement, pose and rock face agree.
+	var aim_angle := state.last_aim.angle()
+	if state.last_aim.x < 0.0: aim_angle = wrapf(aim_angle + PI, -PI, PI)
+	sprite.rotation = clampf(aim_angle, -0.72, 0.72)
 	sprite.flip_h = state.last_aim.x < -0.1
 
 func _request_drill(aim: Vector2) -> int:
@@ -78,17 +86,20 @@ func _request_drill(aim: Vector2) -> int:
 	# directly touching the rig reliably break instead of sampling past thin seams.
 	var direction := aim.normalized()
 	var queued := 0
-	var requested: Dictionary[Vector2i, bool] = {}
 	var distance := DRILL_CONTACT_REACH
 	while distance <= DRILL_MAX_REACH:
 		var center := _cell_at(global_position + direction * distance)
 		for cell in _drill_cells(center, direction):
-			if queued >= DRILL_CELLS_PER_TICK: break
-			if not requested.has(cell) and terrain.request_damage(cell):
-				requested[cell] = true
-				queued += 1
+			if terrain.request_damage(cell, DRILL_DAMAGE_PER_TICK):
+				queued = 1
+				break
 		if queued > 0: break
 		distance += DRILL_SAMPLE_STEP
+	drill_contact_point = global_position + direction * DRILL_CONTACT_REACH
+	drill_contact_active = queued > 0
+	_set_feedback_contact(drill_contact_point, direction, drill_contact_active)
+	if queued > 0:
+		velocity = velocity.lerp(direction * DRILL_BITE_SPEED, 0.16)
 	if queued > 0: _add_camera_trauma(0.025)
 	if queued > 0 and _drill_feedback_cooldown <= 0.0:
 		_emit_drill_feedback(global_position + direction * DRILL_CONTACT_REACH, direction, queued)
@@ -108,7 +119,12 @@ func _emit_drill_feedback(hit_point: Vector2, direction: Vector2, strength: int)
 	if feedback != null and feedback.has_method("on_drill_hit"):
 		feedback.call("on_drill_hit", hit_point, direction, strength)
 	if has_node("Sprite"):
-		$Sprite.position = -direction * 1.5
+		$Sprite.position = -direction * 2.5
+
+func _set_feedback_contact(point: Vector2, direction: Vector2, active: bool) -> void:
+	var feedback := get_node_or_null("../M2Feedback")
+	if feedback != null and feedback.has_method("set_drill_contact"):
+		feedback.call("set_drill_contact", point, direction, active)
 
 func _consume_collision_impact(is_colliding: bool, impact_speed: float) -> bool:
 	var should_shake := is_colliding and not _was_colliding and impact_speed >= 70.0

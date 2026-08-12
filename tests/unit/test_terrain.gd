@@ -9,6 +9,19 @@ func test_tile_damage_is_deduplicated_per_frame() -> bool:
 	assert_equal(terrain.commit_damage(), 1)
 	return true
 
+func test_drill_damage_builds_cracks_before_tile_breaks() -> bool:
+	var terrain := TerrainService.new(); terrain.setup(16, 16)
+	var cell := Vector2i(4, 4)
+	for _tick in range(TerrainService.TILE_DURABILITY - 1):
+		terrain.request_damage(cell, 1)
+		assert_equal(terrain.commit_damage(), 0)
+	assert_true(terrain.is_solid(cell), "drill damage must show progress before removal")
+	assert_true(terrain.damage_ratio(cell) > 0.9)
+	terrain.request_damage(cell, 1)
+	assert_equal(terrain.commit_damage(), 1)
+	assert_true(not terrain.is_solid(cell), "tile breaks only after durability is exhausted")
+	return true
+
 func test_removed_tile_has_no_ghost_collision() -> bool:
 	var terrain := TerrainService.new(); terrain.setup(64, 64)
 	terrain.request_damage(Vector2i(4, 4)); terrain.commit_damage()
