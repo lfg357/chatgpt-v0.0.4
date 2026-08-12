@@ -3,6 +3,7 @@ extends Control
 const AppStateDefinition = preload("res://src/core/app_state.gd")
 
 @onready var terrain_world = $TerrainWorld
+@onready var drill_rig = $DrillRig
 @onready var title: Label = $Title
 @onready var instruction: Label = $Instruction
 @onready var status: Label = $Status
@@ -37,7 +38,5 @@ func _input(event: InputEvent) -> void:
 
 func _update_status() -> void:
 	var terrain: Variant = terrain_world.terrain
-	var format := tr("dive.sandbox.status")
-	if format == "dive.sandbox.status":
-		format = "Queued: %d | Dirty chunks: %d | Collision rebuilds: %d"
-	status.text = format % [terrain.pending_damage.size(), terrain.dirty_chunks.size(), terrain.total_rebuilds]
+	var state = drill_rig.state
+	status.text = "Hull %03d  Energy %03d  Heat %03d  %s  Pins %d  Sonar %.1f" % [state.durability, state.energy, state.heat, "PAUSED" if drill_rig.paused else "ACTIVE", drill_rig.tools.blast_pins.size(), drill_rig.tools.sonar_seconds]

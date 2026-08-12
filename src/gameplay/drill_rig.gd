@@ -2,8 +2,10 @@ class_name DrillRig extends CharacterBody2D
 
 const RunState = preload("res://src/domain/m2_run_state.gd")
 const ControlFrameValue = preload("res://src/domain/control_frame.gd")
+const Tools = preload("res://src/domain/m2_tools.gd")
 @export var terrain_path: NodePath
 var state := RunState.new()
+var tools := Tools.new()
 var terrain: Node
 var paused := false
 
@@ -21,6 +23,15 @@ func _physics_process(delta: float) -> void:
 	velocity.y = minf(velocity.y + RunState.GRAVITY * delta, RunState.MAX_FALL_SPEED)
 	move_and_slide()
 	if result.drilling: _request_drill(state.last_aim)
+	if frame.has_pressed(2):
+		var cell := _cell_at(global_position + state.last_aim * 18.0)
+		if tools.blast_pins.is_empty(): tools.place_pin(cell)
+		else: tools.detonate(terrain)
+	if frame.has_pressed(8): tools.activate_sonar()
+	if frame.has_pressed(16): tools.place_beacon(global_position)
+	tools.tick(delta, frame.has_held(32), paused)
+	if has_node("M2Camera"):
+		$M2Camera.update_target(global_position, state.last_aim, velocity, delta)
 
 func _request_drill(aim: Vector2) -> void:
 	if terrain == null: return
@@ -33,3 +44,11 @@ func _request_drill(aim: Vector2) -> void:
 			var delta := Vector2(x - center.x, y - center.y)
 			if delta == Vector2.ZERO or aim.dot(delta.normalized()) >= cos(deg_to_rad(30.0)):
 				if terrain.request_damage(Vector2i(x, y)): queued += 1
+
+func _cell_at(point: Vector2) -> Vector2i:
+	return Vector2i(floori(point.x / terrain.cell_size), floori(point.y / terrain.cell_size))
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		paused = true
+		InputService.clear_after_focus_loss()

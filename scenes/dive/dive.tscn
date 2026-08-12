@@ -1,8 +1,12 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource path="res://scenes/dive/dive.gd" type="Script" id="1_dive"]
 [ext_resource path="res://src/gameplay/terrain_world.gd" type="Script" id="2_terrain"]
 [ext_resource path="res://src/gameplay/drill_rig.gd" type="Script" id="3_rig"]
+[ext_resource path="res://src/gameplay/m2_camera.gd" type="Script" id="4_camera"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_rig"]
+radius = 6.0
 
 [node name="Dive" type="Control"]
 layout_mode = 3
@@ -42,7 +46,12 @@ script = ExtResource("3_rig")
 terrain_path = NodePath("../TerrainWorld")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DrillRig"]
-shape = null
+shape = SubResource("CircleShape2D_rig")
+
+[node name="M2Camera" type="Camera2D" parent="DrillRig"]
+position_smoothing_enabled = true
+script = ExtResource("4_camera")
+map_bounds = Rect2(64, 86, 512, 208)
 
 [node name="Status" type="Label" parent="."]
 layout_mode = 0
