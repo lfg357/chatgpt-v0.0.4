@@ -43,7 +43,6 @@ func _physics_process(delta: float) -> void:
 	var cable_damage := cable.tick(delta, _near_module(&"room_ind_cable_vault", 20.0))
 	if cable_damage > 0: _damage(cable_damage, &"hazard_cable")
 	_update_room_interactions(delta)
-	queue_redraw()
 
 func _seed_minerals() -> void:
 	var mineral_ids: Array[StringName] = [&"ore_ferrite", &"ore_copper_thread", &"ore_lumen"]
@@ -58,11 +57,15 @@ func mark_blast_damage(center: Vector2i, radius: int = 4) -> void:
 		if cell.distance_squared_to(center) <= radius * radius: mineral_cells[cell].damaged = true
 
 func _on_cells_removed(cells: Array[Vector2i]) -> void:
+	var minerals_changed := false
 	for cell in cells:
 		if mineral_cells.has(cell):
 			var mineral: Dictionary = mineral_cells[cell]
-			if run.collect(mineral.id, mineral.damaged, mineral.near_cable): mineral_cells.erase(cell)
+			if run.collect(mineral.id, mineral.damaged, mineral.near_cable):
+				mineral_cells.erase(cell)
+				minerals_changed = true
 			else: terrain.restore_solid(cell)
+	if minerals_changed: queue_redraw()
 
 func _update_room_interactions(delta: float) -> void:
 	for room in generated_map.room_instances:

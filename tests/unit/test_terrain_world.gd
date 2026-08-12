@@ -14,3 +14,14 @@ func test_dirty_chunk_disables_existing_collision_before_rebuild() -> bool:
 	assert_true(not world.terrain.has_collision(Vector2i(1, 1)))
 	world.free()
 	return true
+
+func test_chunk_collision_merges_horizontal_solid_runs() -> bool:
+	var world := TerrainWorld.new()
+	world.grid_size = Vector2i(32, 32)
+	world.terrain.setup(32, 32)
+	world._rebuild_chunk_collision(Vector2i.ZERO)
+	var body: StaticBody2D = world.chunk_bodies[Vector2i.ZERO]
+	assert_equal(body.get_child_count(), 32, "a full chunk should use one collision run per row")
+	assert_true(body.get_child_count() < 1024, "collision rebuild must not allocate one node per tile")
+	world.free()
+	return true

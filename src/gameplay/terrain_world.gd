@@ -3,6 +3,7 @@ class_name TerrainWorld extends Node2D
 signal cells_removed(cells: Array[Vector2i])
 
 const TerrainServiceValue = preload("res://src/gameplay/terrain_service.gd")
+const DAMAGE_REDRAW_INTERVAL := 1.0 / 30.0
 
 ## Presentation and collision adapter for TerrainService.
 ## TerrainService remains the only terrain truth; dirty chunks disable old collision
@@ -13,6 +14,7 @@ const TerrainServiceValue = preload("res://src/gameplay/terrain_service.gd")
 @export var m2_graybox := false
 var terrain := TerrainServiceValue.new()
 var chunk_bodies: Dictionary[Vector2i, StaticBody2D] = {}
+var _damage_redraw_elapsed := 0.0
 
 func _ready() -> void:
 	terrain.setup(grid_size.x, grid_size.y)
@@ -48,13 +50,18 @@ func request_explosion(center: Vector2i, radius: int) -> int:
 func restore_solid(cell: Vector2i) -> bool:
 	return terrain.restore_solid(cell)
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	var had_pending_damage := not terrain.pending_damage.is_empty()
 	var changed := terrain.commit_damage()
 	if changed > 0: cells_removed.emit(terrain.last_removed_cells.duplicate())
 	if changed > 0:
 		_disable_dirty_chunk_collision()
-	if had_pending_damage: queue_redraw()
+	_damage_redraw_elapsed += delta
+	# Crack progress changes at physics frequency, but redrawing the complete
+	# terrain at 60+ Hz is wasteful. Broken cells still redraw immediately.
+	if changed > 0 or (had_pending_damage and _damage_redraw_elapsed >= DAMAGE_REDRAW_INTERVAL):
+		queue_redraw()
+		_damage_redraw_elapsed = 0.0
 	var dirty_before := terrain.dirty_chunks.duplicate()
 	terrain.physics_tick()
 	for chunk in dirty_before:
@@ -87,16 +94,27 @@ func _rebuild_chunk_collision(chunk: Vector2i) -> void:
 	chunk_bodies[chunk] = body
 	var start := chunk * TerrainServiceValue.CHUNK_SIZE
 	var end := Vector2i(mini(start.x + TerrainServiceValue.CHUNK_SIZE, grid_size.x), mini(start.y + TerrainServiceValue.CHUNK_SIZE, grid_size.y))
+	# Merge each horizontal run of solid cells into one rectangle. A full 32x32
+	# chunk now needs 32 shapes instead of 1024, avoiding a large allocation and
+	# scene-tree spike whenever drilling breaks a cell.
 	for y in range(start.y, end.y):
-		for x in range(start.x, end.x):
-			var cell := Vector2i(x, y)
-			if terrain.is_solid(cell):
-				var collider := CollisionShape2D.new()
-				var shape := RectangleShape2D.new()
-				shape.size = Vector2(cell_size, cell_size)
-				collider.shape = shape
-				collider.position = Vector2(cell.x * cell_size + cell_size * 0.5, cell.y * cell_size + cell_size * 0.5)
-				body.add_child(collider)
+		var run_start := -1
+		for x in range(start.x, end.x + 1):
+			var solid := x < end.x and terrain.is_solid(Vector2i(x, y))
+			if solid and run_start < 0:
+				run_start = x
+			elif not solid and run_start >= 0:
+				_add_collision_run(body, y, run_start, x)
+				run_start = -1
+
+func _add_collision_run(body: StaticBody2D, y: int, start_x: int, end_x: int) -> void:
+	var width_cells := end_x - start_x
+	var collider := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = Vector2(width_cells * cell_size, cell_size)
+	collider.shape = shape
+	collider.position = Vector2((start_x + width_cells * 0.5) * cell_size, (y + 0.5) * cell_size)
+	body.add_child(collider)
 
 func _draw() -> void:
 	var bounds := Rect2(Vector2.ZERO, Vector2(grid_size * cell_size))
