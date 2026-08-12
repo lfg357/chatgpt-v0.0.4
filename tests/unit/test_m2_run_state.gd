@@ -32,6 +32,16 @@ func test_gamepad_defaults_are_mapped() -> bool:
 	assert_true(InputMap.action_get_events(&"drill").size() >= 2)
 	assert_true(InputMap.action_get_events(&"aim_right").size() >= 1)
 	return true
+func test_real_gamepad_event_selects_gamepad_control_frame() -> bool:
+	var stick := InputEventJoypadMotion.new()
+	stick.axis = JOY_AXIS_RIGHT_X
+	stick.axis_value = 0.8
+	InputService._input(stick)
+	var frame = InputService.frame_from_actions(Vector2.ZERO, 101)
+	assert_equal(frame.device_family, &"gamepad")
+	assert_equal(frame.aim, Vector2.RIGHT)
+	InputService.note_keyboard_mouse_input()
+	return true
 func test_resume_suppresses_residual_mouse_actions() -> bool:
 	InputService.suppress_gameplay_for_frames(1)
 	var frame=InputService.frame_from_actions(Vector2.RIGHT, 99)

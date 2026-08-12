@@ -10,6 +10,9 @@ func test_dive_scene_exposes_terrain_validation_sandbox() -> bool:
 	assert_true(dive.has_node("M2Hud"))
 	assert_true(dive.has_node("M2Hud/PausePanel/Resume"))
 	assert_true(dive.has_node("M2Hud/PausePanel/ReturnToHub"))
+	assert_true(dive.has_node("M2Hud/VitalsPanel"))
+	assert_true(dive.has_node("M2Hud/HeatPanel/HeatFill"))
+	assert_true(dive.has_node("M2Hud/ExtractionPanel"))
 	assert_true(dive.has_node("M2Feedback"))
 	assert_true(not dive.get_node("Title").visible, "dive title must not overlap the top HUD")
 	assert_true(dive.get_node("Instruction").position.y >= 60.0, "instruction reserves the top HUD safety area")
@@ -31,5 +34,15 @@ func test_controller_disconnect_pauses_live_rig() -> bool:
 	runner_tree.root.add_child(dive)
 	dive.drill_rig._on_joy_connection_changed(0, false)
 	assert_true(dive.drill_rig.paused)
+	dive.queue_free()
+	return true
+
+func test_extraction_routes_to_results_state() -> bool:
+	var dive := DiveScene.instantiate()
+	runner_tree.root.add_child(dive)
+	AppState.mode = AppState.AppMode.DIVE
+	var result = SceneRouter.go_to(AppState.AppMode.RESULTS)
+	assert_true(result.ok, "extraction target transition is legal from dive")
+	assert_equal(AppState.mode, AppState.AppMode.RESULTS)
 	dive.queue_free()
 	return true

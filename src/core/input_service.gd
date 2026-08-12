@@ -21,9 +21,11 @@ func _input(event: InputEvent) -> void:
 		note_keyboard_mouse_input()
 
 func note_gamepad_input() -> void:
+	_ignore_until_next_input = false
 	if device_family != &"gamepad": device_family = &"gamepad"; device_family_changed.emit(device_family)
 
 func note_keyboard_mouse_input() -> void:
+	_ignore_until_next_input = false
 	if device_family != &"keyboard_mouse": device_family = &"keyboard_mouse"; device_family_changed.emit(device_family)
 
 func clear_after_focus_loss() -> void:

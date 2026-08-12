@@ -3,15 +3,18 @@ class_name DrillRig extends CharacterBody2D
 const RunState = preload("res://src/domain/m2_run_state.gd")
 const ControlFrameValue = preload("res://src/domain/control_frame.gd")
 const Tools = preload("res://src/domain/m2_tools.gd")
+const AppStateDefinition = preload("res://src/core/app_state.gd")
 @export var terrain_path: NodePath
 var state := RunState.new()
 var tools := Tools.new()
 var terrain: Node
 var paused := false
+var _collision_trauma_cooldown := 0.0
 
 func _ready() -> void:
 	terrain = get_node_or_null(terrain_path)
 	Input.joy_connection_changed.connect(_on_joy_connection_changed)
+	state.run_failed.connect(_on_run_failed)
 
 func set_paused(value: bool) -> void:
 	paused = value
@@ -20,6 +23,7 @@ func set_paused(value: bool) -> void:
 		InputService.suppress_gameplay_for_frames()
 
 func _physics_process(delta: float) -> void:
+	_collision_trauma_cooldown = maxf(0.0, _collision_trauma_cooldown - delta)
 	var mouse_aim := get_global_mouse_position() - global_position
 	var frame = InputService.frame_from_actions(mouse_aim, Engine.get_physics_frames())
 	if frame.has_pressed(64): set_paused(not paused)
@@ -30,16 +34,19 @@ func _physics_process(delta: float) -> void:
 	velocity = velocity.move_toward(desired, RunState.THRUST_ACCEL * delta)
 	velocity.y = minf(velocity.y + RunState.GRAVITY * delta, RunState.MAX_FALL_SPEED)
 	move_and_slide()
+	if get_slide_collision_count() > 0 and _collision_trauma_cooldown <= 0.0:
+		_add_camera_trauma(0.2)
+		_collision_trauma_cooldown = 0.15
 	if result.drilling: _request_drill(state.last_aim)
 	if frame.has_pressed(2):
 		var cell := _cell_at(global_position + state.last_aim * 18.0)
 		if tools.blast_pins.is_empty(): tools.place_pin(cell)
 		else:
-			if tools.detonate(terrain) > 0 and has_node("M2Camera"): $M2Camera.add_trauma(0.35)
+			if tools.detonate(terrain) > 0: _add_camera_trauma(0.35)
 	if frame.has_pressed(8): tools.activate_sonar()
 	if frame.has_pressed(16): tools.place_beacon(global_position)
 	if tools.tick(delta, frame.has_held(32), paused):
-		SceneRouter.go_to(4)
+		SceneRouter.go_to(AppStateDefinition.AppMode.RESULTS)
 		return
 	if has_node("M2Camera"):
 		$M2Camera.update_target(global_position, state.last_aim, velocity, delta)
@@ -49,7 +56,8 @@ func _update_sprite(drilling: bool) -> void:
 	if not has_node("Sprite"): return
 	var sprite: AnimatedSprite2D = $Sprite
 	var wanted := &"idle"
-	if state.shutdown_seconds > 0.0: wanted = &"overheat"
+	if state.failed: wanted = &"overheat"
+	elif state.shutdown_seconds > 0.0: wanted = &"overheat"
 	elif drilling: wanted = &"drill"
 	elif velocity.length() > 5.0: wanted = &"thrust"
 	if sprite.animation != wanted: sprite.play(wanted)
@@ -62,10 +70,19 @@ func _request_drill(aim: Vector2) -> void:
 	var queued := 0
 	for y in range(center.y - 1, center.y + 2):
 		for x in range(center.x - 1, center.x + 2):
-			if queued >= 4: return
+			if queued >= 4: break
 			var delta := Vector2(x - center.x, y - center.y)
 			if delta == Vector2.ZERO or aim.dot(delta.normalized()) >= cos(deg_to_rad(30.0)):
 				if terrain.request_damage(Vector2i(x, y)): queued += 1
+	if queued > 0: _add_camera_trauma(0.05)
+
+func _add_camera_trauma(amount: float) -> void:
+	if has_node("M2Camera"): $M2Camera.add_trauma(amount)
+
+func _on_run_failed() -> void:
+	velocity = Vector2.ZERO
+	_add_camera_trauma(1.0)
+	_update_sprite(false)
 
 func _cell_at(point: Vector2) -> Vector2i:
 	return Vector2i(floori(point.x / terrain.cell_size), floori(point.y / terrain.cell_size))
