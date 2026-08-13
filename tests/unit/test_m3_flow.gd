@@ -72,6 +72,13 @@ func test_debug_panel_exposes_reachable_overlay() -> bool:
 	dive.queue_free(); AppState.current_run_config = null
 	return true
 
+func test_dive_controller_reports_nonnegative_current_depth() -> bool:
+	var dive = DiveScene.instantiate(); runner_tree.root.add_child(dive)
+	var controller = dive.get_node("M3DiveController")
+	assert_true(controller.current_depth_cells() >= 0)
+	dive.queue_free(); AppState.current_run_config = null
+	return true
+
 func test_boiler_timeout_damage_reaches_live_rig_and_can_destroy() -> bool:
 	var dive = DiveScene.instantiate(); runner_tree.root.add_child(dive); var controller = dive.get_node("M3DiveController")
 	controller.rig.state.durability = 20.0; controller.run.boiler.active = true; controller.run.boiler.remaining = 0.01

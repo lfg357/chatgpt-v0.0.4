@@ -35,7 +35,7 @@ m2.hud.tool,BLAST PIN %d,爆破钉 %d
 m2.hud.utility,SONAR %.1f  BEACON %d,声呐 %.1f  信标 %d
 m2.hud.extract,HOLD F: EXTRACT %.0f%%,长按 F：撤离 %.0f%%
 m3.hud.objective,CARGO %d/%d\nCOMBO x%.1f %.1fs,货舱 %d/%d\n连击 x%.1f %.1f秒
-m3.hud.status,ROOM %s | CORE %.1fs | VALVES %d/3,房间 %s｜核心 %.1f秒｜阀门 %d/3
+m3.hud.status,DEPTH %d | ROOM %s | CORE %.1fs | VALVES %d/3,深度 %d｜房间 %s｜核心 %.1f秒｜阀门 %d/3
 m3.hud.extract,%s EXTRACT %.0f%%,%s 撤离 %.0f%%
 m3.warning.steam,STEAM WARNING,蒸汽预警
 m3.warning.steam_firing,STEAM FIRING,蒸汽喷射

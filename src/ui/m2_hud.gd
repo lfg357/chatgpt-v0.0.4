@@ -43,7 +43,7 @@ func _process(_delta: float) -> void:
 		var run = controller.run
 		objective.text = (tr("m3.hud.objective") % [run.cargo_used, run.CARGO_CAPACITY, run.combo_multiplier(), run.combo_remaining]).replace("\\n", "\n")
 		var valves_done: int = int(run.boiler.valves.count(true))
-		dive_status.text = tr("m3.hud.status") % [String(controller.current_room_id()), run.boiler.remaining if run.boiler.active else 0.0, valves_done]
+		dive_status.text = tr("m3.hud.status") % [controller.current_depth_cells(), String(controller.current_room_id()), run.boiler.remaining if run.boiler.active else 0.0, valves_done]
 		var warning: StringName = controller.current_warning()
 		danger.text = tr("m3.warning.%s" % String(warning)) if warning != &"" else ""
 	else: objective.text = (tr("m2.hud.objective") % int(rig.global_position.y)).replace("\\n", "\n")

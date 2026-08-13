@@ -174,6 +174,8 @@ func current_room_id() -> StringName:
 	for room in generated_map.room_instances:
 		if Rect2(Vector2(room.position * terrain.cell_size), Vector2(room.size * terrain.cell_size)).has_point(rig.global_position): return room.module_id
 	return &"corridor"
+func current_depth_cells() -> int:
+	return maxi(0, floori(rig.global_position.y / terrain.cell_size))
 func current_warning() -> StringName:
 	if steam.state == steam.State.WARNING and _near_module(&"room_ind_steam_cross", 96.0): return &"steam"
 	if steam.state == steam.State.FIRING and _near_module(&"room_ind_steam_cross", 96.0): return &"steam_firing"

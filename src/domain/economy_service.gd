@@ -1,6 +1,7 @@
 class_name EconomyService extends RefCounted
 
 const SettlementValue = preload("res://src/domain/settlement.gd")
+const VALID_CARGO_IDS: Array[StringName] = [&"ore_ferrite", &"ore_copper_thread", &"ore_lumen", &"core"]
 var snapshot: Variant
 var applied_run_ids: Dictionary = {}
 
@@ -12,6 +13,8 @@ func apply_run_result(result: Variant):
 	if applied_run_ids.has(result.run_id): settlement.error_code = &"already_settled"; return settlement
 	var totals := {"scrap": 0, "data": 0, "core": 0}
 	for entry in result.cargo:
+		if entry == null or not VALID_CARGO_IDS.has(entry.mineral_id) or entry.count < 0 or entry.scrap_value < 0 or entry.data_value < 0 or entry.damaged_count < 0 or entry.damaged_count > entry.count:
+			settlement.error_code = &"invalid_cargo"; return settlement
 		if entry.mineral_id == &"core": totals.core += entry.count
 		else: totals.scrap += entry.scrap_value; totals.data += entry.data_value
 	if result.success:

@@ -50,6 +50,14 @@ func test_failure_loses_all_unbanked_cores() -> bool:
 	assert_equal(settlement.banked_resources.core, 0); assert_equal(settlement.lost_resources.core, 3)
 	return true
 
+func test_settlement_rejects_unknown_or_invalid_cargo() -> bool:
+	var run = _run(); var bad = preload("res://src/domain/cargo_entry.gd").new()
+	bad.mineral_id = &"ore_unknown"; bad.count = 1; bad.scrap_value = 3
+	run.cargo[bad.mineral_id] = bad
+	var settlement = Economy.new().apply_run_result(run.finish(true))
+	assert_true(not settlement.committed); assert_equal(settlement.error_code, &"invalid_cargo")
+	return true
+
 func test_terminal_result_is_mutually_exclusive_and_idempotent() -> bool:
 	var run = _run(); var result = run.finish(true); assert_true(result.success)
 	assert_true(run.finish(false, &"destroyed") == result); assert_equal(run.phase, run.RunPhase.COMPLETED)
