@@ -19,6 +19,7 @@ func _ready() -> void:
 	$Routes.toggled.connect(func(value): controller.show_routes = value; controller.queue_redraw())
 	$Anchors.toggled.connect(func(value): controller.show_anchors = value; controller.queue_redraw())
 	$Budgets.toggled.connect(func(value): controller.show_budgets = value; controller.queue_redraw())
+	$Reachable.toggled.connect(func(value): controller.show_reachable = value; controller.queue_redraw())
 	$Chunks.toggled.connect(func(value): controller.show_chunks = value; controller.queue_redraw())
 	$Export.pressed.connect(func(): $Export.text = "EXPORTED" if controller.debug_export() else "EXPORT FAILED")
 	for layer in ["layer_industrial", "layer_bio", "layer_mech"]: $Layer.add_item(layer)

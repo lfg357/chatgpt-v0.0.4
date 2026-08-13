@@ -405,14 +405,20 @@ offset_right = 210.0
 offset_bottom = 262.0
 text = "BUDGET"
 [node name="Chunks" type="CheckButton" parent="HudLayer/M3DebugPanel"]
-offset_left = 212.0
-offset_top = 238.0
-offset_right = 278.0
-offset_bottom = 262.0
-text = "CHUNK"
-[node name="Export" type="Button" parent="HudLayer/M3DebugPanel"]
 offset_left = 6.0
 offset_top = 266.0
+offset_right = 72.0
+offset_bottom = 290.0
+text = "CHUNK"
+[node name="Reachable" type="CheckButton" parent="HudLayer/M3DebugPanel"]
+offset_left = 74.0
+offset_top = 266.0
+offset_right = 158.0
+offset_bottom = 290.0
+text = "REACH"
+[node name="Export" type="Button" parent="HudLayer/M3DebugPanel"]
+offset_left = 6.0
+offset_top = 294.0
 offset_right = 278.0
-offset_bottom = 292.0
+offset_bottom = 320.0
 text = "EXPORT DEBUG SNAPSHOT"

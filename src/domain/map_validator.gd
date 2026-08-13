@@ -27,6 +27,10 @@ func validate(map: Variant):
 	report.valid = report.error_codes.is_empty()
 	return report
 
+func reachable_cells(map: Variant, start: Vector2i = Vector2i(-1, -1)) -> Dictionary:
+	if map == null: return {}
+	return _flood(map, map.spawn_cell if start == Vector2i(-1, -1) else start)
+
 func _check_rooms(map: Variant, report: Variant) -> void:
 	for index in range(map.room_instances.size()):
 		var room: Dictionary = map.room_instances[index]

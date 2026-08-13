@@ -61,6 +61,17 @@ func test_production_hazards_and_mite_are_connected_to_map_state() -> bool:
 		dive.free(); AppState.current_run_config = null
 	return true
 
+func test_debug_panel_exposes_reachable_overlay() -> bool:
+	var dive = DiveScene.instantiate(); runner_tree.root.add_child(dive)
+	var controller = dive.get_node("M3DiveController")
+	var panel = dive.get_node("HudLayer/M3DebugPanel")
+	assert_true(panel.has_node("Reachable"))
+	panel.get_node("Reachable").button_pressed = true
+	assert_true(controller.show_reachable)
+	assert_true(not preload("res://src/domain/map_validator.gd").new().reachable_cells(controller.generated_map).is_empty())
+	dive.queue_free(); AppState.current_run_config = null
+	return true
+
 func test_boiler_timeout_damage_reaches_live_rig_and_can_destroy() -> bool:
 	var dive = DiveScene.instantiate(); runner_tree.root.add_child(dive); var controller = dive.get_node("M3DiveController")
 	controller.rig.state.durability = 20.0; controller.run.boiler.active = true; controller.run.boiler.remaining = 0.01

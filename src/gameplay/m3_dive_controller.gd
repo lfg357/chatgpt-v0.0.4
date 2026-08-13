@@ -7,6 +7,7 @@ const ConfigValue = preload("res://src/domain/run_config.gd")
 const AppStateDefinition = preload("res://src/core/app_state.gd")
 const LoggerValue = preload("res://src/core/playtest_logger.gd")
 const MiteValue = preload("res://src/domain/scrap_mite_state.gd")
+const ValidatorValue = preload("res://src/domain/map_validator.gd")
 var generated_map: Variant
 var run := RunValue.new()
 var mineral_cells: Dictionary = {}
@@ -239,6 +240,9 @@ func _on_overheat() -> void:
 func _on_domain_event(kind: StringName, data: Dictionary) -> void: LoggerValue.record(kind, data)
 func _draw() -> void:
 	if generated_map == null: return
+	if show_reachable:
+		for cell in ValidatorValue.new().reachable_cells(generated_map):
+			draw_rect(Rect2(Vector2(cell * terrain.cell_size), Vector2.ONE * terrain.cell_size), Color("4ee6ab20"))
 	for room in generated_map.room_instances:
 		var color := Color("d85b6a40") if room.route == &"risk" else Color("73d1c828")
 		draw_rect(Rect2(Vector2(room.position * terrain.cell_size), Vector2(room.size * terrain.cell_size)), color, false, 2.0)
