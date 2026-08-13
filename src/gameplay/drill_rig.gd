@@ -106,9 +106,12 @@ func _request_drill(aim: Vector2) -> int:
 	_set_feedback_contact(drill_contact_point, direction, drill_contact_active)
 	if queued > 0:
 		velocity = velocity.lerp(direction * DRILL_BITE_SPEED, 0.16)
-	if queued > 0: _add_camera_trauma(0.025)
 	if queued > 0 and _drill_feedback_cooldown <= 0.0:
 		_emit_drill_feedback(global_position + direction * DRILL_CONTACT_REACH, direction, queued)
+		# Continuous drilling runs at physics rate. Accumulating camera trauma at
+		# 60 Hz made the viewport look like it was dropping frames; couple the
+		# subtle shake to the already-rate-limited visible hit cadence instead.
+		_add_camera_trauma(0.012)
 		_drill_feedback_cooldown = 0.055
 	return queued
 

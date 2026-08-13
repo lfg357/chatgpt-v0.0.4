@@ -93,6 +93,31 @@ func test_drill_hit_spawns_visible_feedback() -> bool:
 	dive.queue_free()
 	return true
 
+func test_continuous_drill_camera_trauma_is_rate_limited() -> bool:
+	var dive := DiveScene.instantiate()
+	runner_tree.root.add_child(dive)
+	var rig = dive.get_node("DrillRig")
+	var terrain = dive.get_node("TerrainWorld")
+	var camera = rig.get_node("M2Camera")
+	var target := Vector2i(-1, -1)
+	for y in range(1, terrain.grid_size.y - 1):
+		for x in range(2, terrain.grid_size.x - 1):
+			if terrain.terrain.is_solid(Vector2i(x, y)) and not terrain.terrain.is_solid(Vector2i(x - 1, y)):
+				target = Vector2i(x, y); break
+		if target.x >= 0: break
+	assert_true(target.x >= 0)
+	rig.global_position = Vector2(target.x * terrain.cell_size - 6, target.y * terrain.cell_size + 4)
+	# A held drill should not inject a full shake every physics frame. The
+	# feedback cooldown remains the single cadence gate for particles and shake.
+	rig._drill_feedback_cooldown = 0.01
+	rig._request_drill(Vector2.RIGHT)
+	assert_equal(camera.trauma, 0.0)
+	rig._drill_feedback_cooldown = 0.0
+	rig._request_drill(Vector2.RIGHT)
+	assert_true(camera.trauma > 0.0 and camera.trauma <= 0.012)
+	dive.queue_free()
+	return true
+
 func test_extraction_routes_to_results_state() -> bool:
 	var dive := DiveScene.instantiate()
 	runner_tree.root.add_child(dive)
